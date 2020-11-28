@@ -4,7 +4,7 @@
  * \author FTDI
  * \date 20110523
  *
- * Copyright ï¿½ 2000-2014 Future Technology Devices International Limited
+ * Copyright © 2000-2014 Future Technology Devices International Limited
  *
  *
  * THIS SOFTWARE IS PROVIDED BY FUTURE TECHNOLOGY DEVICES INTERNATIONAL LIMITED ``AS IS'' AND ANY EXPRESS
@@ -68,8 +68,8 @@ FT_STATUS SPI_SaveChannelConfig(FT_HANDLE handle, ChannelConfig *config);
 FT_STATUS SPI_GetChannelConfig(FT_HANDLE handle, ChannelConfig **config);
 FT_STATUS SPI_DisplayList(void);
 /* Read/Write functions */
-FT_STATUS SPI_Write8bits(FT_HANDLE handle,uint8 byte, uint8 len);
-FT_STATUS SPI_Read8bits(FT_HANDLE handle,uint8 *byte, uint8 len);
+FT_STATUS SPI_Write8bits(FT_HANDLE handle,uint8 byte, uint8 len, uint8 lsb);
+FT_STATUS SPI_Read8bits(FT_HANDLE handle,uint8 *byte, uint8 len, uint8 lsb);
 //FT_STATUS SPI_ToggleCS(FT_HANDLE handle, bool state);
 
 
@@ -345,6 +345,9 @@ FTDI_API FT_STATUS SPI_Read(FT_HANDLE handle, uint8 *buffer,
 	//uint32 i;
 	uint8 byte = 0;
 	uint8 bitsToTransfer=0;
+	uint8 lsb = 0;
+
+	
 	FN_ENTER;
 #ifdef ENABLE_PARAMETER_CHECKING
 	CHECK_NULL_RET(handle);
@@ -353,6 +356,11 @@ FTDI_API FT_STATUS SPI_Read(FT_HANDLE handle, uint8 *buffer,
 #endif
 	LOCK_CHANNEL(handle);
 
+	if(transferOptions & SPI_TRANSFER_OPTIONS_LSB_FIRST)
+	{
+		lsb = MPSSE_CMD_DATA_LSB_FIRST;
+	}
+	
 	if(transferOptions & SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE)
 	{
 		/* Enable CHIPSELECT line for the channel */
@@ -369,7 +377,7 @@ FTDI_API FT_STATUS SPI_Read(FT_HANDLE handle, uint8 *buffer,
 				bitsToTransfer = 8;
 			else
 				bitsToTransfer = (uint8)(sizeToTransfer - *sizeTransferred);
-			status = SPI_Read8bits(handle,&byte, bitsToTransfer);
+			status = SPI_Read8bits(handle,&byte, bitsToTransfer, lsb);
 			buffer[(*sizeTransferred+1)/8] = byte;
 			CHECK_STATUS(status);
 			if(FT_OK == status)
@@ -378,8 +386,8 @@ FTDI_API FT_STATUS SPI_Read(FT_HANDLE handle, uint8 *buffer,
 	}
 	else
 	{/*sizeToTransfer is in bytes*/
-		uint32 noOfBytes=0,noOfBytesTransferred=0;
-		uint8 cmdBuffer[10];
+		uint32 noOfBytesTransferred=0, CurrentXferSize = 0;
+		uint8 cmdBuffer[4];
 		ChannelConfig *config=NULL;
 		uint8 mode;
 
@@ -391,34 +399,44 @@ FTDI_API FT_STATUS SPI_Read(FT_HANDLE handle, uint8 *buffer,
 		switch(mode)
 		{
 			case 0:
-				cmdBuffer[noOfBytes++] = MPSSE_CMD_DATA_IN_BYTES_POS_EDGE;
+				cmdBuffer[0] = MPSSE_CMD_DATA_IN_BYTES_POS_EDGE | lsb;
 				break;
 			case 1:
-				cmdBuffer[noOfBytes++] = MPSSE_CMD_DATA_IN_BYTES_NEG_EDGE;
+				cmdBuffer[0] = MPSSE_CMD_DATA_IN_BYTES_NEG_EDGE | lsb;
 				break;
 			case 2:
-				cmdBuffer[noOfBytes++] = MPSSE_CMD_DATA_IN_BYTES_NEG_EDGE;
+				cmdBuffer[0] = MPSSE_CMD_DATA_IN_BYTES_NEG_EDGE | lsb;
 				break;
 			case 3:
-				cmdBuffer[noOfBytes++] = MPSSE_CMD_DATA_IN_BYTES_POS_EDGE;
+				cmdBuffer[0] = MPSSE_CMD_DATA_IN_BYTES_POS_EDGE | lsb;
 				break;
 			default:
 				DBG(MSG_DEBUG,"invalid mode(%u)\n",(unsigned)mode);
 		}
+
+		*sizeTransferred=0;
+		while(*sizeTransferred<sizeToTransfer)
+		{
+		
+			CurrentXferSize = ((sizeToTransfer - *sizeTransferred) > 64*1024)? 64*1024:(sizeToTransfer - *sizeTransferred);
 		/* length LSB */
-		cmdBuffer[noOfBytes++] = (uint8)((sizeToTransfer-1) & 0x000000FF) ;
+			cmdBuffer[1] = (uint8)((CurrentXferSize-1) & 0x000000FF) ;
 		/* length MSB */
-		cmdBuffer[noOfBytes++] = (uint8)(((sizeToTransfer-1) & 0x0000FF00)>>8);
+			cmdBuffer[2] = (uint8)(((CurrentXferSize-1) & 0x0000FF00)>>8);
 
 		/*Command MPSSE to send data to PC immediately */
-		cmdBuffer[noOfBytes++] = MPSSE_CMD_SEND_IMMEDIATE;
-		status = FT_Channel_Write(SPI,handle,noOfBytes,cmdBuffer,
+			cmdBuffer[3] = MPSSE_CMD_SEND_IMMEDIATE;
+			status = FT_Channel_Write(SPI,handle,sizeof(cmdBuffer),cmdBuffer,
+				&noOfBytesTransferred);
+			CHECK_STATUS(status);
+			noOfBytesTransferred = 0;
+			status = FT_Channel_Read(SPI,handle,CurrentXferSize,&buffer[*sizeTransferred],
 			&noOfBytesTransferred);
 		CHECK_STATUS(status);
 
-		status = FT_Channel_Read(SPI,handle,sizeToTransfer,buffer,
-			sizeTransferred);
-		CHECK_STATUS(status);
+			*sizeTransferred += noOfBytesTransferred;
+		}
+		
 		DBG(MSG_DEBUG,"sizeToTransfer=%u sizeTransferred=%u cmdBuffer[0]=0x%x  \
 			cmdBuffer[1]=0x%x cmdBuffer[2]=0x%x buffer[0]=0x%x buffer[1]=0x%x\n"
 			,sizeToTransfer,sizeTransferred,cmdBuffer[0],cmdBuffer[1],
@@ -468,6 +486,8 @@ FTDI_API FT_STATUS SPI_Write(FT_HANDLE handle, uint8 *buffer,
 	ChannelConfig *config=NULL;
 	uint8 byte;
 	uint8 bitsToTransfer=0;
+
+	uint8 lsb = 0;
 	FN_ENTER;
 
 #ifdef ENABLE_PARAMETER_CHECKING
@@ -481,6 +501,11 @@ FTDI_API FT_STATUS SPI_Write(FT_HANDLE handle, uint8 *buffer,
 	/* Mode is given by bit1-bit0 of ChannelConfig.Options */
 	DBG(MSG_DEBUG,"configOptions=0x%x\n",(unsigned)config->configOptions);
 	DBG(MSG_DEBUG,"LatencyTimer=%u\n",(unsigned)config->LatencyTimer);
+
+	if(transferOptions & SPI_TRANSFER_OPTIONS_LSB_FIRST)
+	{
+		lsb = MPSSE_CMD_DATA_LSB_FIRST;
+	}
 	if(transferOptions & SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE)
 	{
 		/* enable CHIPSELECT line for the channel */
@@ -497,9 +522,9 @@ FTDI_API FT_STATUS SPI_Write(FT_HANDLE handle, uint8 *buffer,
 			if((sizeToTransfer - *sizeTransferred)>=8)
 				bitsToTransfer = 8;
 			else
-				bitsToTransfer = (uint8)(sizeToTransfer - *sizeTransferred);
+				bitsToTransfer = sizeToTransfer - *sizeTransferred;
 			byte = buffer[(*sizeTransferred+1)/8];
-			status = SPI_Write8bits(handle,byte,bitsToTransfer);
+			status = SPI_Write8bits(handle,byte,bitsToTransfer, lsb);
 			CHECK_STATUS(status);
 			if(FT_OK == status)
 				*sizeTransferred += bitsToTransfer;
@@ -507,7 +532,7 @@ FTDI_API FT_STATUS SPI_Write(FT_HANDLE handle, uint8 *buffer,
 	}
 	else
 	{/* sizeToTransfer is in bytes */
-		uint32 noOfBytes=0,noOfBytesTransferred=0;
+		uint32 noOfBytesTransferred=0, CurrentXferSize = 0;
 		uint8 cmdBuffer[3];
 		ChannelConfig *config=NULL;
 		uint8 mode;
@@ -520,32 +545,43 @@ FTDI_API FT_STATUS SPI_Write(FT_HANDLE handle, uint8 *buffer,
 		switch(mode)
 		{
 			case SPI_CONFIG_OPTION_MODE0:
-				cmdBuffer[noOfBytes++] = MPSSE_CMD_DATA_OUT_BYTES_NEG_EDGE;
+				cmdBuffer[0] = MPSSE_CMD_DATA_OUT_BYTES_NEG_EDGE | lsb;
 				break;
 			case SPI_CONFIG_OPTION_MODE1:
-				cmdBuffer[noOfBytes++] = MPSSE_CMD_DATA_OUT_BYTES_POS_EDGE;
+				cmdBuffer[0] = MPSSE_CMD_DATA_OUT_BYTES_POS_EDGE | lsb;
 				break;
 			case SPI_CONFIG_OPTION_MODE2:
-				cmdBuffer[noOfBytes++] = MPSSE_CMD_DATA_OUT_BYTES_POS_EDGE;
+				cmdBuffer[0] = MPSSE_CMD_DATA_OUT_BYTES_POS_EDGE | lsb;
 				break;
 			case SPI_CONFIG_OPTION_MODE3:
-				cmdBuffer[noOfBytes++] = MPSSE_CMD_DATA_OUT_BYTES_NEG_EDGE;
+				cmdBuffer[0] = MPSSE_CMD_DATA_OUT_BYTES_NEG_EDGE | lsb;
 				break;
 			default:
 				DBG(MSG_DEBUG,"invalid mode(%u)\n",(unsigned)mode);
 		}
+
+		*sizeTransferred = 0;
+		
+		while(*sizeTransferred < sizeToTransfer)
+		{
+
+			CurrentXferSize = ((sizeToTransfer - *sizeTransferred) > 64*1024)? 64*1024:(sizeToTransfer - *sizeTransferred);
 		/* length low byte */
-		cmdBuffer[noOfBytes++] = (uint8)((sizeToTransfer-1) & 0x000000FF);
+			cmdBuffer[1] = (uint8)((CurrentXferSize-1) & 0x000000FF);
 		/* length high byte */
-		cmdBuffer[noOfBytes++] = (uint8)(((sizeToTransfer-1) & 0x0000FF00)>>8);
+			cmdBuffer[2] = (uint8)(((CurrentXferSize-1) & 0x0000FF00)>>8);
 		/* write command */
-		status = FT_Channel_Write(SPI,handle,noOfBytes,cmdBuffer,\
+			status = FT_Channel_Write(SPI,handle,sizeof(cmdBuffer),cmdBuffer,\
 			&noOfBytesTransferred);
 		CHECK_STATUS(status);
 		/* write data */
-		status = FT_Channel_Write(SPI,handle,sizeToTransfer,buffer,\
-			sizeTransferred);
+			status = FT_Channel_Write(SPI,handle,CurrentXferSize,buffer,\
+				&noOfBytesTransferred);
+			*sizeTransferred += noOfBytesTransferred;
+			
 		CHECK_STATUS(status);
+			
+		}
 	}
 
 	if(transferOptions & SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE)
@@ -595,7 +631,7 @@ FTDI_API FT_STATUS SPI_ReadWrite(FT_HANDLE handle, uint8 *inBuffer,
 	ChannelConfig *config=NULL;
 	uint8 mode;
 	uint8 bitsToTransfer=0;
-	uint32 noOfBytes=0,noOfBytesTransferred=0;
+	uint32 noOfBytesTransferred=0;
 	uint8 cmdBuffer[10];
 	FN_ENTER;
 
@@ -676,8 +712,8 @@ FTDI_API FT_STATUS SPI_ReadWrite(FT_HANDLE handle, uint8 *inBuffer,
 		}
 	}
 	else
-	{/*sizeToTransfer is in bytes*/
-		*sizeTransferred=0;
+	{
+		uint32 CurrentXferSize = 0;
 		/* Command to write 8bits */
 		switch(mode)
 		{
@@ -696,16 +732,27 @@ FTDI_API FT_STATUS SPI_ReadWrite(FT_HANDLE handle, uint8 *inBuffer,
 			default:
 				DBG(MSG_DEBUG,"invalid mode(%u)\n",(unsigned)mode);
 		}
-		cmdBuffer[1] = (uint8)((sizeToTransfer-1) & 0x000000FF);/* lengthL */
-		cmdBuffer[2] = (uint8)(((sizeToTransfer-1) & 0x0000FF00)>>8);/*lenghtH*/
+
+
+
+		///
+		*sizeTransferred=0;
+		while(*sizeTransferred<sizeToTransfer)
+		{
+		
+			CurrentXferSize = ((sizeToTransfer - *sizeTransferred) > 64*1024)? 64*1024:(sizeToTransfer - *sizeTransferred);
+			/* length LSB */
+			cmdBuffer[1] = (uint8)((CurrentXferSize-1) & 0x000000FF) ;
+			/* length MSB */
+			cmdBuffer[2] = (uint8)(((CurrentXferSize-1) & 0x0000FF00)>>8);
+
 
 		/*Write command*/
-		status = FT_Channel_Write(SPI,handle,3,cmdBuffer,&noOfBytesTransferred);
+			status = FT_Channel_Write(SPI,handle,sizeof(cmdBuffer),cmdBuffer,
+				&noOfBytesTransferred);
 		CHECK_STATUS(status);
-
-		/*Write data*/
-		noOfBytes = sizeToTransfer;
-		status = FT_Channel_Write(SPI,handle,noOfBytes,outBuffer,\
+			noOfBytesTransferred = 0;
+			status = FT_Channel_Write(SPI,handle,CurrentXferSize,&outBuffer[*sizeTransferred],\
 			&noOfBytesTransferred);
 		CHECK_STATUS(status);
 		#if 0
@@ -720,9 +767,9 @@ FTDI_API FT_STATUS SPI_ReadWrite(FT_HANDLE handle, uint8 *inBuffer,
 		}
 		#endif
 
-		/*Read from buffer*/
-		status = FT_Channel_Read(SPI,handle,sizeToTransfer,inBuffer,\
-			sizeTransferred);
+			noOfBytesTransferred = 0;		
+			status = FT_Channel_Read(SPI,handle,CurrentXferSize,&inBuffer[*sizeTransferred],
+				&noOfBytesTransferred);
 		CHECK_STATUS(status);
 		#if 0
 		{//for debugging
@@ -735,6 +782,8 @@ FTDI_API FT_STATUS SPI_ReadWrite(FT_HANDLE handle, uint8 *inBuffer,
 			printf("\n");
 		}
 		#endif
+			*sizeTransferred += noOfBytesTransferred;
+		}
 	}
 	/* end of transfer */
 
@@ -786,7 +835,7 @@ FTDI_API FT_STATUS SPI_IsBusy(FT_HANDLE handle, bool *state)
 	status = FT_Channel_Read(SPI,handle,noOfBytes,buffer,&noOfBytesTransferred);
 	CHECK_STATUS(status);
 	DBG(MSG_DEBUG,"Low byte read = 0x%x\n",buffer[0]);
-	if(0 == (buffer[0] && 0x04))
+	if(0 == (buffer[0] & 0x04))
 		*state=FALSE;
 	else
 		*state=TRUE;
@@ -987,8 +1036,9 @@ FT_STATUS SPI_DelChannelConfig(FT_HANDLE handle)
 			{/*Node found*/
 				if(tempNode == ListHead)
 				{/* Is the first node */
-					INFRA_FREE(ListHead);
-					ListHead = NULL;
+					
+					ListHead = tempNode->next;
+					INFRA_FREE(tempNode);
 				}
 				else if(NULL == tempNode->next)
 				{/*Last node*/
@@ -1260,7 +1310,7 @@ FT_STATUS SPI_ToggleCS(FT_HANDLE handle, bool state)
  * \note
  * \warning
  */
-FT_STATUS SPI_Write8bits(FT_HANDLE handle,uint8 byte, uint8 len)
+FT_STATUS SPI_Write8bits(FT_HANDLE handle,uint8 byte, uint8 len, uint8 lsb)
 {
 	FT_STATUS status=FT_OTHER_ERROR;
 	uint32 noOfBytes=0,noOfBytesTransferred=0;
@@ -1277,16 +1327,16 @@ FT_STATUS SPI_Write8bits(FT_HANDLE handle,uint8 byte, uint8 len)
 	switch(mode)
 	{
 		case 0:
-			buffer[noOfBytes++] = MPSSE_CMD_DATA_OUT_BITS_NEG_EDGE;
+			buffer[noOfBytes++] = MPSSE_CMD_DATA_OUT_BITS_NEG_EDGE | lsb;
 			break;
 		case 1:
-			buffer[noOfBytes++] = MPSSE_CMD_DATA_OUT_BITS_POS_EDGE;
+			buffer[noOfBytes++] = MPSSE_CMD_DATA_OUT_BITS_POS_EDGE | lsb;
 			break;
 		case 2:
-			buffer[noOfBytes++] = MPSSE_CMD_DATA_OUT_BITS_POS_EDGE;
+			buffer[noOfBytes++] = MPSSE_CMD_DATA_OUT_BITS_POS_EDGE | lsb;
 			break;
 		case 3:
-			buffer[noOfBytes++] = MPSSE_CMD_DATA_OUT_BITS_NEG_EDGE;
+			buffer[noOfBytes++] = MPSSE_CMD_DATA_OUT_BITS_NEG_EDGE | lsb;
 			break;
 		default:
 			DBG(MSG_DEBUG,"invalid mode(%u)\n",(unsigned)mode);
@@ -1318,7 +1368,7 @@ FT_STATUS SPI_Write8bits(FT_HANDLE handle,uint8 byte, uint8 len)
  * \note
  * \warning
  */
-FT_STATUS SPI_Read8bits(FT_HANDLE handle,uint8 *byte, uint8 len)
+FT_STATUS SPI_Read8bits(FT_HANDLE handle,uint8 *byte, uint8 len, uint8 lsb)
 {
 	FT_STATUS status=FT_OTHER_ERROR;
 	uint32 noOfBytes=0,noOfBytesTransferred=0;
@@ -1335,16 +1385,16 @@ FT_STATUS SPI_Read8bits(FT_HANDLE handle,uint8 *byte, uint8 len)
 	switch(mode)
 	{
 		case 0:
-			buffer[noOfBytes++] = MPSSE_CMD_DATA_IN_BITS_POS_EDGE;
+			buffer[noOfBytes++] = MPSSE_CMD_DATA_IN_BITS_POS_EDGE | lsb;
 			break;
 		case 1:
-			buffer[noOfBytes++] = MPSSE_CMD_DATA_IN_BITS_NEG_EDGE;
+			buffer[noOfBytes++] = MPSSE_CMD_DATA_IN_BITS_NEG_EDGE | lsb;
 			break;
 		case 2:
-			buffer[noOfBytes++] = MPSSE_CMD_DATA_IN_BITS_NEG_EDGE;
+			buffer[noOfBytes++] = MPSSE_CMD_DATA_IN_BITS_NEG_EDGE | lsb;
 			break;
 		case 3:
-			buffer[noOfBytes++] = MPSSE_CMD_DATA_IN_BITS_POS_EDGE;
+			buffer[noOfBytes++] = MPSSE_CMD_DATA_IN_BITS_POS_EDGE | lsb;
 			break;
 		default:
 			DBG(MSG_DEBUG,"invalid mode(%u)\n",(unsigned)mode);

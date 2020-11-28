@@ -64,7 +64,8 @@ Implement the lock/unlock only if really required, otherwise keep as placeholder
 #define MPSSE_CMD_DISABLE_3PHASE_CLOCKING	0x8D
 #define MPSSE_CMD_ENABLE_DRIVE_ONLY_ZERO	0x9E
 
-
+/*MPSSE Data Command - LSB First */
+#define MPSSE_CMD_DATA_LSB_FIRST			0x08
 
 /*MPSSE Data Commands - bit mode - MSB first */
 #define MPSSE_CMD_DATA_OUT_BITS_POS_EDGE	0x12

@@ -45,6 +45,9 @@
 #define	SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE		0x00000002
 /* transferOptions-Bit2: if BIT2 is 1 then CHIP_SELECT line will be disabled at end of transfer */
 #define SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE		0x00000004
+/* transferOptions-Bit3: if BIT3 is 1 then LSB will be processed first */
+#define SPI_TRANSFER_OPTIONS_LSB_FIRST				0x00000008
+
 
 /* Bit definition of the Options member of configOptions structure */
 #define SPI_CONFIG_OPTION_MODE_MASK		0x00000003

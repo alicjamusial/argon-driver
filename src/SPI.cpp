@@ -1,11 +1,10 @@
+#include "mpsse/libMPSSE_spi.h"
 #include <Windows.h>
 #include <algorithm>
-#include "mpsse/libMPSSE_spi.h"
 #include <ftd2xx.h>
 #include <iostream>
 
 #include "SPI.h"
-
 
 SPI::SPI(uint32_t channel, uint32_t frequency, SPIBusOptions busOptions)
 {
@@ -30,7 +29,6 @@ SPI::~SPI()
 void SPI::ChipSelect(bool state) const
 {
     Check(SPI_ToggleCS(this->_handle, state));
-
 }
 
 void SPI::Write(const uint8_t* data, size_t size) const
@@ -58,7 +56,7 @@ void SPI::Read(uint8_t* data, size_t size) const
 
     auto position = data;
 
-    while (size > 0)
+    while(size > 0)
     {
         uint32_t chunkSize = std::min(size, static_cast<size_t>(0x10000));
 
@@ -72,28 +70,37 @@ void SPI::Read(uint8_t* data, size_t size) const
 
 std::uint8_t SPI::Exchange(const std::uint8_t input)
 {
-	std::uint8_t output = 55;
-	uint32 transferred;
+    std::uint8_t output = 55;
+    uint32 transferred;
 
-	SPI_ReadWrite(this->_handle, &output, const_cast<std::uint8_t*>(&input),  1, &transferred, SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES);
+    SPI_ReadWrite(
+        this->_handle, &output, const_cast<std::uint8_t*>(&input), 1, &transferred, SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES);
 
-	return output;
+    return output;
 }
 
-uint32_t SPI::FindChannelBySerialNumber(const char* serialNumber)
+uint32_t SPI::FindChannelByPort(const char port)
 {
     uint32 channels;
     SPI_GetNumChannels(&channels);
     printf("Channels: %d\n", channels);
-    for (int i = 0; i < channels; i++)
+    for(int i = 0; i < channels; i++)
     {
         FT_DEVICE_LIST_INFO_NODE info;
 
         SPI_GetChannelInfo(i, &info);
+        //
+        //        printf("\n\nDev %d:\n", i);
+        //        printf("  Flags=0x%x\n", info.Flags);
+        //        printf(" Type=0x%x\n", info.Type);
+        //        printf("  ID=0x%x\n", info.ID);
+        //        printf(" LocId=0x%x\n", info.LocId);
+        //        printf("  SerialNumber=%s\n", info.SerialNumber);
+        //        printf(" Description=%s\n", info.Description);
+        //        printf("  ftHandle=0x%x\n", info.ftHandle);
 
-        printf("Num: %c\n", info.SerialNumber);
-
-        if (strcmp(info.SerialNumber, serialNumber) == 0)
+        std::size_t length = strlen(info.Description);
+        if(info.Description[length - 1] == port)
         {
             return i;
         }

@@ -163,8 +163,13 @@ status=FT_INVALID_PARAMETER ; return(status);}else{;}};
 /* Memory allocating, freeing & copying macros -  */
 #define INFRA_MALLOC(exp)			malloc(exp); \
 	DBG(MSG_DEBUG,"INFRA_MALLOC %ubytes\n",exp);
-#define INFRA_FREE(exp)				free(exp); \
-	DBG(MSG_DEBUG,"INFRA_FREE 0x%x\n",exp);
+#define INFRA_FREE(exp)				\
+	DBG(MSG_DEBUG,"INFRA_FREE 0x%x\n",exp);\
+	if(exp) \
+	{ \
+		free(exp); \
+		exp = NULL; \
+	}
 #define INFRA_MEMCPY(dest,src,siz)	memcpy(dest,src,siz);\
 	DBG(MSG_DEBUG,"INFRA_MEMCPY dest:0x%x src:0x%x size:0x%x\n",dest,src,siz);
 
@@ -187,9 +192,9 @@ status=FT_INVALID_PARAMETER ; return(status);}else{;}};
 	typedef signed char   int8;
 	typedef signed short  int16;
 	typedef signed long long int64;
-    #ifndef __cplusplus
-	    typedef unsigned char	bool;
-    #endif
+
+	typedef unsigned char	bool;
+
 	#ifdef __x86_64__
 		typedef unsigned int   uint32;
 		typedef signed int   int32;

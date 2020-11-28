@@ -4,7 +4,7 @@
  * \author FTDI
  * \date 20110321
  *
- * Copyright ï¿½ 2000-2014 Future Technology Devices International Limited
+ * Copyright © 2000-2014 Future Technology Devices International Limited
  *
  *
  * THIS SOFTWARE IS PROVIDED BY FUTURE TECHNOLOGY DEVICES INTERNATIONAL LIMITED ``AS IS'' AND ANY EXPRESS
@@ -96,7 +96,7 @@ FT_STATUS FT_GetNumChannels(FT_LegacyProtocol Protocol, uint32 *numChans)
 	*numChans = MID_NO_CHANNEL_FOUND;
 	/*Get the number of devices connected to the system(FT_CreateDeviceInfoList)*/
 	status = varFunctionPtrLst.p_FT_GetNumChannel(&tempNumChannels);
-	printf("\n status=0x%x     tempNumChannels=%d\n",status,tempNumChannels);
+//	printf("\n status=0x%x     tempNumChannels=%d\n",status,tempNumChannels);
 	/*Check if the status is Ok */
 	if(status == FT_OK)
 	{
@@ -110,7 +110,6 @@ FT_STATUS FT_GetNumChannels(FT_LegacyProtocol Protocol, uint32 *numChans)
 				*tempNumChannels);
 			if(NULL == pDeviceList)
 			{
-                printf("\n insufff");
 				return FT_INSUFFICIENT_RESOURCES;
 			}
 			/*get the devices information(FT_GetDeviceInfoList)*/
@@ -647,27 +646,29 @@ bool Mid_CheckMPSSEAvailable(FT_DEVICE_LIST_INFO_NODE devList)
 	bool isMPSSEAvailable = MID_NO_MPSSE;
 	FN_ENTER;
 	/*check TYPE field*/
-	printf("\n\tdevList.Type=0x%x\n",devList.Type);
-	printf("\tdevList.LocId=0x%x\n",devList.LocId);
+//	printf("\n\tdevList.Type=0x%x\n",devList.Type);
+//	printf("\tdevList.LocId=0x%x\n",devList.LocId);
+
+	byte los = strlen(devList.Description);
+
 	switch(devList.Type)
 	{
 		case FT_DEVICE_2232C:
-			if((devList.LocId & 0xf)==1)
+			
+			if (devList.Description[los-1] == 0x41)   //Last character = 0x41 = ASCII "A"
 			{
 				isMPSSEAvailable =  MID_MPSSE_AVAILABLE;
 			}
 			break;
 		case FT_DEVICE_2232H:
-			if(((devList.LocId & 0xf)==1)|| ((devList.LocId & 0xf)==2))
+			if ((devList.Description[los - 1] == 0x41) || (devList.Description[los - 1] == 0x42))  //Last character = 0x41 = ASCII "A", 0x42 = ASCII "B"
 			{
 				isMPSSEAvailable =  MID_MPSSE_AVAILABLE;
 			}
 			break;
 		case FT_DEVICE_4232H:
-		    printf("Dobry ftdi");
-			if(((devList.LocId & 0xf)==1)|| ((devList.LocId & 0xf)==2))
+			if ((devList.Description[los - 1] == 0x41) || (devList.Description[los - 1] == 0x42))  //Last character = 0x41 = ASCII "A", 0x42 = ASCII "B"
 			{
-                printf("TO MA BYC");
 				isMPSSEAvailable =  MID_MPSSE_AVAILABLE;
 			}
 			break;
@@ -1122,7 +1123,7 @@ FT_STATUS Mid_SetClock(FT_HANDLE handle, FT_DEVICE ftDevice, uint32 clock)
 	{
 		case FT_DEVICE_2232C:/* This is actually FT2232D but defined is FT_DEVICE_2232C
 			in D2XX. Also, it is the only FS device that supports MPSSE */
-			value = (MID_30MHZ/clock) - 1;
+			value = (MID_6MHZ/clock) - 1;
 			break;
 
 		default:/* Assuming all new chips will he HS MPSSE devices */
@@ -1273,7 +1274,7 @@ FTDI_API FT_STATUS FT_WriteGPIO(FT_HANDLE handle, uint8 dir, uint8 value)
 	uint32 bufIdx = 0;
 
 	FN_ENTER;
-#if 0 //def FT800_232HM
+#if 1 //def FT800_232HM
 	buffer[bufIdx++] = MPSSE_CMD_SET_DATA_BITS_HIGHBYTE;
 	buffer[bufIdx++] = value;
 	buffer[bufIdx++] = dir;

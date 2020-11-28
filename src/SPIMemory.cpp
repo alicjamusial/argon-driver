@@ -154,91 +154,102 @@ int main(int argc, char** argv)
 {
     Init_libMPSSE();
 
-    //    const char* serialNumber = "FTXPDDZ8A";// "FTZ3CQ6ZB";
-    //
-    //    int channelNo = SPI::FindChannelBySerialNumber(serialNumber);
-    //    printf("Hello World\n");
-    //
-    //    DWORD version;
-    //    auto r = FT_GetLibraryVersion(&version);
-    //
-    //    printf("result = %d\n", r);
-    //    printf("version = 0x%X\n", version);
-    //
-    //    cout << "Using channel " << channelNo << endl;
-    //
-    //    SPI spi(channelNo,  4 * 1000 * 1000, ChipSelectLine3 | ChipSelectActiveLow | SpiMode0);
-    //
-    //    spi.ChipSelect(false);
-    //
-    //	N25Q::Driver flash{spi};
-    //
-    //	if(argc == 2 && strcmp(argv[1], "id") == 0)
-    //	{
-    //		readId(flash);
-    //		return 0;
-    //	}
-    //
-    //	if(argc == 2 && strcmp(argv[1], "check") == 0)
-    //	{
-    //		checkId(flash);
-    //		return 0;
-    //	}
-    //
-    //	if(argc == 3 && strcmp(argv[1], "read") == 0)
-    //	{
-    //		std::cout << "Reading memory to " << argv[2] << std::endl;
-    //		readAllMemory(flash, argv[2]);
-    //		return 0;
-    //	}
-    //
-    //	if(argc == 2 && strcmp(argv[1], "erase_special") == 0)
-    //	{
-    //		std::cout << "Erasing spacial " << std::endl;
-    //		eraseRange(flash, 0x2000, 0x5FE000);
-    //		return 0;
-    //	}
-    //
-    //	if(argc == 2 && strcmp(argv[1], "erase_normal") == 0)
-    //	{
-    //		std::cout << "Erasing normal " << std::endl;
-    //		eraseRange(flash, 0x600000, 0x7FC000);
-    //		return 0;
-    //	}
+    const char port = 'A'; // B
 
-    FT_STATUS ftStatus;
-    FT_DEVICE_LIST_INFO_NODE* devInfo;
-    DWORD numDevs; // create the device information list
+    int channelNo = SPI::FindChannelByPort(port);
 
-    ftStatus = FT_CreateDeviceInfoList(&numDevs);
+    DWORD version;
+    auto r = FT_GetLibraryVersion(&version);
 
-    if(ftStatus == FT_OK)
-    {
-        printf("Number of devices is %d\n", numDevs);
-    }
-    if(numDevs > 0)
-    {
-        devInfo = (FT_DEVICE_LIST_INFO_NODE*)malloc(sizeof(FT_DEVICE_LIST_INFO_NODE) * numDevs);
-        ftStatus = FT_GetDeviceInfoList(devInfo, &numDevs);
-        if(ftStatus == FT_OK)
-        {
-            for(int i = 0; i < numDevs; i++)
-            {
-                printf("Dev %d:\n", i);
-                printf("  Flags=0x%x\n", devInfo[i].Flags);
-                printf(" Type=0x%x\n", devInfo[i].Type);
-                printf("  ID=0x%x\n", devInfo[i].ID);
-                printf(" LocId=0x%x\n", devInfo[i].LocId);
-                printf("  SerialNumber=%s\n", devInfo[i].SerialNumber);
-                printf(" Description=%s\n", devInfo[i].Description);
-                printf("  ftHandle=0x%x\n", devInfo[i].ftHandle);
-            }
-        }
-    }
+    printf("result = %d\n", r);
+    printf("version = 0x%X\n", version);
 
-    std::cout << "SPIMemory id" << std::endl;
-    std::cout << "SPIMemory read <file>" << std::endl;
-    return 1;
+    cout << "Using channel " << channelNo << endl;
+
+    SPI spi(channelNo, 1 * 1000 * 1000, ChipSelectLine3 | ChipSelectActiveLow | SpiMode0);
+
+    spi.ChipSelect(false);
+
+    N25Q::Driver flash{spi};
+
+    readId(flash);
+    readId(flash);
+    readId(flash);
+    readId(flash);
+    readId(flash);
+    readId(flash);
+    readId(flash);
+    readId(flash);
+    readId(flash);
+    readId(flash);
+    readId(flash);
+    readStatus(flash);
+
+    //    if(argc == 2 && strcmp(argv[1], "id") == 0)
+    //    {
+    //        readId(flash);
+    //        return 0;
+    //    }
+    //
+    //    	if(argc == 2 && strcmp(argv[1], "check") == 0)
+    //    	{
+    //    checkId(flash);
+    //    		return 0;
+    //    	}
+    //
+    //    	if(argc == 3 && strcmp(argv[1], "read") == 0)
+    //    	{
+    //    		std::cout << "Reading memory to " << argv[2] << std::endl;
+    //    		readAllMemory(flash, argv[2]);
+    //    		return 0;
+    //    	}
+    //
+    //    	if(argc == 2 && strcmp(argv[1], "erase_special") == 0)
+    //    	{
+    //    		std::cout << "Erasing spacial " << std::endl;
+    //    		eraseRange(flash, 0x2000, 0x5FE000);
+    //    		return 0;
+    //    	}
+    //
+    //    	if(argc == 2 && strcmp(argv[1], "erase_normal") == 0)
+    //    	{
+    //    		std::cout << "Erasing normal " << std::endl;
+    //    		eraseRange(flash, 0x600000, 0x7FC000);
+    //    		return 0;
+    //    	}
+
+    //    FT_STATUS ftStatus;
+    //    FT_DEVICE_LIST_INFO_NODE* devInfo;
+    //    DWORD numDevs; // create the device information list
+    //
+    //    ftStatus = FT_CreateDeviceInfoList(&numDevs);
+    //
+    //    if(ftStatus == FT_OK)
+    //    {
+    //        printf("Number of devices is %d\n", numDevs);
+    //    }
+    //    if(numDevs > 0)
+    //    {
+    //        devInfo = (FT_DEVICE_LIST_INFO_NODE*)malloc(sizeof(FT_DEVICE_LIST_INFO_NODE) *
+    //        numDevs); ftStatus = FT_GetDeviceInfoList(devInfo, &numDevs); if(ftStatus == FT_OK)
+    //        {
+    //            for(int i = 0; i < numDevs; i++)
+    //            {
+    //                printf("Dev %d:\n", i);
+    //                printf("  Flags=0x%x\n", devInfo[i].Flags);
+    //                printf(" Type=0x%x\n", devInfo[i].Type);
+    //                printf("  ID=0x%x\n", devInfo[i].ID);
+    //                printf(" LocId=0x%x\n", devInfo[i].LocId);
+    //                printf("  SerialNumber=%s\n", devInfo[i].SerialNumber);
+    //                printf(" Description=%s\n", devInfo[i].Description);
+    //                printf("  ftHandle=0x%x\n", devInfo[i].ftHandle);
+    //            }
+    //        }
+    //    }
+    //
+    //    std::cout << "SPIMemory id" << std::endl;
+    //    std::cout << "SPIMemory read <file>" << std::endl;
+    //    return 1;
 
     return 0;
 }
