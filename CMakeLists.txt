@@ -12,4 +12,4 @@ set(NAME argon-driver)
 
 project(${NAME})
 
-add_subdirectory(src)
+add_subdirectory(argon)

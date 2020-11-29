@@ -35,10 +35,9 @@ void N25Q::Driver::CommandNoSelect(const uint8_t commandCode, uint8_t* response,
     this->_spi.Read(response, responseSize);
 }
 
-
 N25Q::Id N25Q::Driver::ReadId() const
 {
-    uint8_t response[20] = { 0 };
+    uint8_t response[20] = {0};
 
     this->Command(Command::ReadId, response, sizeof(response));
 
@@ -76,14 +75,14 @@ void N25Q::Driver::WaitBusy() const
 
         this->CommandNoSelect(Command::ReadStatusRegister, &status, sizeof(status));
 
-        if ((status & Status::WriteInProgress) == 0)
+        if((status & Status::WriteInProgress) == 0)
         {
             break;
         }
 
         Sleep(100);
 
-    } while (true);
+    } while(true);
 }
 
 void N25Q::Driver::ReadMemory(uint32_t offset, uint8_t* buffer, size_t size) const
@@ -159,8 +158,7 @@ void N25Q::Driver::WriteByte(const uint8_t byte) const
 
 void N25Q::Driver::WriteAddress(const uint32_t offset) const
 {
-    uint8_t bytes[] =
-    {
+    uint8_t bytes[] = {
         (offset >> 2 * 8) & 0xFF,
         (offset >> 1 * 8) & 0xFF,
         (offset >> 0 * 8) & 0xFF,
@@ -179,10 +177,10 @@ void N25Q::Driver::WaitForStatus(const Status status, bool state) const
 
         auto masked = flag & status;
 
-        if (masked == expected)
+        if(masked == expected)
             return;
 
-    } while (true);
+    } while(true);
 }
 
 void N25Q::Driver::WriteEnable() const

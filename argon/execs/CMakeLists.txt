@@ -5,18 +5,19 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif ()
 
 add_executable(${NAME}
-    main.cpp
-    SPIMemory.cpp
-    SPI.cpp
-    N25QDriver.cpp
+        src/main.cpp
+        src/SPIMemory.cpp
+        src/SPI.cpp
+        src/N25QDriver.cpp
 )
-
-add_subdirectory(mpsse)
-add_subdirectory(ftdi)
 
 target_link_libraries(${NAME}
     PUBLIC
         mpsse
         ftdi
         ${FTDI_DRIVER_PATH}/amd64/ftd2xx.lib
+)
+
+target_include_directories(${NAME} PUBLIC
+    include
 )
