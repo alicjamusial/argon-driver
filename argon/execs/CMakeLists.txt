@@ -5,10 +5,10 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif ()
 
 add_executable(${NAME}
-        src/main.cpp
-        src/SPIMemory.cpp
-        src/SPI.cpp
-        src/N25QDriver.cpp
+    src/main.cpp
+    src/FlashController.cpp
+    src/SPI.cpp
+    src/FlashDriver.cpp
 )
 
 target_link_libraries(${NAME}
