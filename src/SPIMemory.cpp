@@ -173,17 +173,17 @@ int main(int argc, char** argv)
     N25Q::Driver flash{spi};
 
     readId(flash);
-    readId(flash);
-    readId(flash);
-    readId(flash);
-    readId(flash);
-    readId(flash);
-    readId(flash);
-    readId(flash);
-    readId(flash);
-    readId(flash);
-    readId(flash);
-    readStatus(flash);
+    //    readId(flash);
+    //    readId(flash);
+    //    readId(flash);
+    //    readId(flash);
+    //    readId(flash);
+    //    readId(flash);
+    //    readId(flash);
+    //    readId(flash);
+    //    readId(flash);
+    //    readId(flash);
+    //    readStatus(flash);
 
     //    if(argc == 2 && strcmp(argv[1], "id") == 0)
     //    {

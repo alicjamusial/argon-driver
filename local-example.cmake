@@ -1,0 +1,1 @@
+set(FTDI_DRIVER_PATH <your_ftdi_driver_path>)

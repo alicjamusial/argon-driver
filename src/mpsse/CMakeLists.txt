@@ -6,8 +6,8 @@ target_include_directories(${NAME} PUBLIC
 )
 
 target_link_libraries(${NAME} PUBLIC
-        ftdi
-        )
+    ftdi
+)
 
 target_sources(${NAME} PRIVATE
     include/mpsse/ftdi_common.h
@@ -21,4 +21,3 @@ target_sources(${NAME} PRIVATE
     src/ftdi_mid.c
     src/ftdi_spi.c
 )
-#target_include_directories(${NAME} PRIVATE include)
