@@ -52,10 +52,7 @@ namespace spi
         void Write(const std::uint8_t* data, std::size_t size) const;
         void Read(std::uint8_t* data, std::size_t size) const;
 
-        std::uint8_t Exchange(const std::uint8_t input);
-
-    public:
-        static uint32_t FindChannelByPort(const char port);
+        std::uint8_t Exchange(std::uint8_t input);
 
     private:
         FT_HANDLE _handle;

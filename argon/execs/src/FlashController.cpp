@@ -1,7 +1,6 @@
 // SPIMemory.cpp : Defines the entry point for the console application.
 //
 
-//#include "stdafx.h"
 #include <Windows.h>
 #include <fstream>
 #include <iomanip>
@@ -18,24 +17,6 @@ namespace flash
 {
     FlashController::FlashController(FlashDriver& device) : _device{device}
     {
-    }
-
-    void FlashController::ListDevices()
-    {
-        DWORD devicesCount = 0;
-
-        FT_CreateDeviceInfoList(&devicesCount);
-
-        auto devices = new FT_DEVICE_LIST_INFO_NODE[devicesCount];
-
-        auto r = FT_GetDeviceInfoList(devices, &devicesCount);
-
-        std::cout << "Devices count = " << devicesCount << std::endl;
-
-        for(auto i = 0; i < devicesCount; i++)
-        {
-            std::cout << devices[i].Description << "\t" << devices[i].SerialNumber << std::endl;
-        }
     }
 
     void FlashController::ReadId(FlashDriver& device)
@@ -90,7 +71,7 @@ namespace flash
 
     void FlashController::WriteSomething(FlashDriver& device)
     {
-        std::array<uint8_t, 256> data;
+        std::array<uint8_t, 256> data{};
         for(auto i = 0; i < data.size(); i++)
         {
             data[i] = 255 - i;
@@ -105,39 +86,6 @@ namespace flash
         {
             std::cout << "0x" << std::hex << std::uppercase << sector << " " << sector + 4_KB << std::endl;
             device.EraseSubsector(sector);
-        }
-    }
-
-    void FlashController::CheckId(FlashDriver& device)
-    {
-        uint32_t counter = 0;
-        uint32_t failures = 0;
-
-        std::cout << std::dec;
-
-        while(true)
-        {
-            auto id = device.ReadId();
-
-            bool isOk = (id.Manufacturer == 0x20) && (id.MemoryType == 0xBA) && (id.Capacity == 0x18);
-
-            counter++;
-
-            if(!isOk)
-            {
-                failures++;
-
-                std::cout << "Failures " << (double)failures / (double)counter * 100 << "% ("
-                          << failures << "/" << counter << ")" << std::endl;
-            }
-
-            if((counter % 1000) == 0)
-            {
-                std::cout << "Failures " << (double)failures / (double)counter * 100 << "% ("
-                          << failures << "/" << counter << ")" << std::endl;
-            }
-
-            // Sleep(10);
         }
     }
 

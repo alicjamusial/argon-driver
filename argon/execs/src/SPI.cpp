@@ -108,36 +108,6 @@ namespace spi
         return output;
     }
 
-    std::uint32_t SPI::FindChannelByPort(const char port)
-    {
-        std::uint32_t channels;
-        SPI_GetNumChannels(&channels);
-        printf("Channels: %d\n", channels);
-        for(int i = 0; i < channels; i++)
-        {
-            FT_DEVICE_LIST_INFO_NODE info;
-
-            SPI_GetChannelInfo(i, &info);
-            //
-            //        printf("\n\nDev %d:\n", i);
-            //        printf("  Flags=0x%x\n", info.Flags);
-            //        printf(" Type=0x%x\n", info.Type);
-            //        printf("  ID=0x%x\n", info.ID);
-            //        printf(" LocId=0x%x\n", info.LocId);
-            //        printf("  SerialNumber=%s\n", info.SerialNumber);
-            //        printf(" Description=%s\n", info.Description);
-            //        printf("  ftHandle=0x%x\n", info.ftHandle);
-
-            std::size_t length = strlen(info.Description);
-            if(info.Description[length - 1] == port)
-            {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
     void SPI::Check(FT_STATUS status)
     {
         if(status == FT_OK)
