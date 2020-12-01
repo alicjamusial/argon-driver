@@ -27,7 +27,7 @@ namespace flash
 
         this->Command(CommandType::ReadId, response, sizeof(response));
 
-        std::array<std::uint8_t, 17> d;
+        std::array<std::uint8_t, 17> d{};
         for(auto i = 3; i < 20; i++)
         {
             d[i - 3] = response[i];
@@ -41,14 +41,15 @@ namespace flash
         std::uint8_t status;
         this->Command(CommandType::ReadStatusRegister, &status, sizeof(status));
 
-        auto conStatus = static_cast<Status>(status);
-        printf("\nStatus: %d\n", conStatus);
-        printf("Write enabled: %d\n", conStatus & Status::WriteEnabled);
-        printf("ProtectedAreaFromBottom: %d\n", conStatus & Status::ProtectedAreaFromBottom);
-        printf("StatusRegisterWriteDisabled: %d\n", conStatus & Status::StatusRegisterWriteDisabled);
-        printf("WriteInProgress: %d\n", conStatus & Status::WriteInProgress);
+        auto parsedStatus = static_cast<Status>(status);
 
-        return conStatus;
+        //        printf("\nStatus: %d\n", parsedStatus);
+        //        printf("Write enabled: %d\n", parsedStatus & Status::WriteEnabled);
+        //        printf("ProtectedAreaFromBottom: %d\n", parsedStatus & Status::ProtectedAreaFromBottom);
+        //        printf("StatusRegisterWriteDisabled: %d\n", parsedStatus & Status::StatusRegisterWriteDisabled);
+        //        printf("WriteInProgress: %d\n", parsedStatus & Status::WriteInProgress);
+
+        return parsedStatus;
     }
 
     FlagStatus FlashDriver::FlagStatusRegister() const
@@ -56,16 +57,17 @@ namespace flash
         std::uint8_t status;
         this->Command(CommandType::ReadFlagStatusRegister, &status, sizeof(status));
 
-        auto conStatus = static_cast<Status>(status);
-        printf("\nStatus: %d\n", conStatus);
-        printf("Write enabled: %d\n", conStatus & FlagStatus::EraseError);
-        printf("EraseSuspended: %d\n", conStatus & FlagStatus::EraseSuspended);
-        printf("ProgramEraseControllerReady: %d\n", conStatus & FlagStatus::ProgramEraseControllerReady);
-        printf("ProgramError: %d\n", conStatus & FlagStatus::ProgramError);
-        printf("ProgramSuspended: %d\n", conStatus & FlagStatus::ProgramSuspended);
-        printf("VPPDisable: %d\n", conStatus & FlagStatus::VPPDisable);
+        auto parsedStatus = static_cast<FlagStatus>(status);
 
-        return static_cast<FlagStatus>(status);
+        //        printf("\nStatus: %d\n", parsedStatus);
+        //        printf("Write enabled: %d\n", parsedStatus & FlagStatus::EraseError);
+        //        printf("EraseSuspended: %d\n", parsedStatus & FlagStatus::EraseSuspended);
+        //        printf("ProgramEraseControllerReady: %d\n", parsedStatus & FlagStatus::ProgramEraseControllerReady);
+        //        printf("ProgramError: %d\n", parsedStatus & FlagStatus::ProgramError);
+        //        printf("ProgramSuspended: %d\n", parsedStatus & FlagStatus::ProgramSuspended);
+        //        printf("VPPDisable: %d\n", parsedStatus & FlagStatus::VPPDisable);
+
+        return parsedStatus;
     }
 
     void FlashDriver::WaitBusy() const
@@ -73,16 +75,12 @@ namespace flash
         do
         {
             Sleep(100);
-            std::cout << "B";
+            std::cout << "waiting...\n";
             std::uint8_t status = 0;
 
             this->CommandNoSelect(CommandType::ReadStatusRegister, &status, sizeof(status));
-            auto conStatus = static_cast<Status>(status);
-            //            StatusRegister();
 
-            printf("\n\nCON STATUS: %d, %d\n\n", conStatus, conStatus & Status::WriteInProgress);
-
-            if((conStatus & Status::WriteInProgress) == 0)
+            if((static_cast<Status>(status) & Status::WriteInProgress) == 0)
             {
                 break;
             }
@@ -105,8 +103,6 @@ namespace flash
 
         {
             SPISelectSlave select(this->_spi);
-
-            std::uint8_t status = 0;
 
             this->WriteCommand(CommandType::ProgramMemory);
             this->WriteAddress(offset);
