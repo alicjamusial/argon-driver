@@ -66,8 +66,6 @@ namespace spi
         {
             std::uint32_t chunkSize = std::min(size, static_cast<size_t>(0x10000));
 
-            printf("Wrigin chunk %d\n", chunkSize);
-
             std::uint32_t transferred;
             Check(SPI_Write(
                 this->_handle, position, chunkSize, &transferred, SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES));

@@ -115,6 +115,11 @@ int main(int argc, char** argv)
                     flashController.ReadId();
                 }
 
+                if(action == "status")
+                {
+                    flashController.ReadStatus();
+                }
+
                 if(action == "read")
                 {
                     std::string location;

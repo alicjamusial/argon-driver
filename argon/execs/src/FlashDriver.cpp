@@ -41,13 +41,29 @@ namespace flash
         std::uint8_t status;
         this->Command(CommandType::ReadStatusRegister, &status, sizeof(status));
 
-        return static_cast<Status>(status);
+        auto conStatus = static_cast<Status>(status);
+        printf("\nStatus: %d\n", conStatus);
+        printf("Write enabled: %d\n", conStatus & Status::WriteEnabled);
+        printf("ProtectedAreaFromBottom: %d\n", conStatus & Status::ProtectedAreaFromBottom);
+        printf("StatusRegisterWriteDisabled: %d\n", conStatus & Status::StatusRegisterWriteDisabled);
+        printf("WriteInProgress: %d\n", conStatus & Status::WriteInProgress);
+
+        return conStatus;
     }
 
     FlagStatus FlashDriver::FlagStatusRegister() const
     {
         std::uint8_t status;
         this->Command(CommandType::ReadFlagStatusRegister, &status, sizeof(status));
+
+        auto conStatus = static_cast<Status>(status);
+        printf("\nStatus: %d\n", conStatus);
+        printf("Write enabled: %d\n", conStatus & FlagStatus::EraseError);
+        printf("EraseSuspended: %d\n", conStatus & FlagStatus::EraseSuspended);
+        printf("ProgramEraseControllerReady: %d\n", conStatus & FlagStatus::ProgramEraseControllerReady);
+        printf("ProgramError: %d\n", conStatus & FlagStatus::ProgramError);
+        printf("ProgramSuspended: %d\n", conStatus & FlagStatus::ProgramSuspended);
+        printf("VPPDisable: %d\n", conStatus & FlagStatus::VPPDisable);
 
         return static_cast<FlagStatus>(status);
     }
@@ -56,18 +72,20 @@ namespace flash
     {
         do
         {
+            Sleep(100);
             std::cout << "B";
             std::uint8_t status = 0;
 
             this->CommandNoSelect(CommandType::ReadStatusRegister, &status, sizeof(status));
+            auto conStatus = static_cast<Status>(status);
+            //            StatusRegister();
 
-            if((status & Status::WriteInProgress) == 0)
+            printf("\n\nCON STATUS: %d, %d\n\n", conStatus, conStatus & Status::WriteInProgress);
+
+            if((conStatus & Status::WriteInProgress) == 0)
             {
                 break;
             }
-
-            Sleep(100);
-
         } while(true);
     }
 
@@ -88,10 +106,24 @@ namespace flash
         {
             SPISelectSlave select(this->_spi);
 
+            std::uint8_t status = 0;
+            printf("Writing command\n");
             this->WriteCommand(CommandType::ProgramMemory);
+
+            StatusRegister();
+
+            printf("\nWriting address\n");
             this->WriteAddress(offset);
 
+            StatusRegister();
+
+            printf("\nWriting data\n");
             this->_spi.Write(data, size);
+
+            StatusRegister();
+        }
+        {
+            SPISelectSlave select(this->_spi);
 
             this->WaitBusy();
         }

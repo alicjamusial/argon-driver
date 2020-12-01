@@ -71,13 +71,13 @@ namespace flash
 
     void FlashController::WriteSomething()
     {
-        std::array<uint8_t, 2> data{};
+        std::array<uint8_t, 44> data{};
         for(auto i = 0; i < data.size(); i++)
         {
             data[i] = 255 - i;
         }
 
-        _device.ProgramMemory(1_KB, data.data(), data.size());
+        _device.ProgramMemory(2_MB + 512_KB, data.data(), data.size());
     }
 
     void FlashController::EraseRange(std::uint32_t start, std::uint32_t end)
