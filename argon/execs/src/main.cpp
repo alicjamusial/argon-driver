@@ -91,13 +91,12 @@ int main(int argc, char** argv)
 
     if(listDevices() > 0)
     {
+        std::uint32_t channels = listChannels();
+        std::uint32_t channelNo = 0;
+
         // Console mode
         if(argc > 2)
         {
-            std::uint32_t channels = listChannels();
-
-            std::uint32_t channelNo = 0;
-
             std::string channelInput = argv[1];
             std::from_chars(channelInput.data(), channelInput.data() + channelInput.size(), channelNo);
 
@@ -171,10 +170,6 @@ int main(int argc, char** argv)
         // Manual mode
         else
         {
-            uint32_t channels = listChannels();
-
-            uint32_t channelNo = 0;
-
             std::cout << "\nChoose channel: ";
             std::cin >> channelNo;
 
