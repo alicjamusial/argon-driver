@@ -19,9 +19,9 @@ namespace flash
     {
     }
 
-    void FlashController::ReadId(FlashDriver& device)
+    void FlashController::ReadId()
     {
-        auto id = device.ReadId();
+        auto id = _device.ReadId();
 
         std::cout
             << "Manufacturer " << std::uppercase << std::hex << "0x" << (int)id.Manufacturer << std::endl
@@ -37,7 +37,7 @@ namespace flash
         std::cout << std::endl;
     }
 
-    void FlashController::ReadAllMemory(FlashDriver& device, const char* fileName)
+    void FlashController::ReadAllMemory(const char* fileName)
     {
         auto buffer = new std::array<uint8_t, 1_MB>();
 
@@ -50,7 +50,7 @@ namespace flash
 
             buffer->fill(0xCC);
 
-            device.ReadMemory(offset, buffer->data(), buffer->size());
+            _device.ReadMemory(offset, buffer->data(), buffer->size());
 
             out.write(reinterpret_cast<char*>(buffer->data()), buffer->size());
         }
@@ -58,18 +58,18 @@ namespace flash
         delete buffer;
     }
 
-    void FlashController::ReadStatus(FlashDriver& device)
+    void FlashController::ReadStatus()
     {
-        uint8_t status = device.StatusRegister();
+        uint8_t status = _device.StatusRegister();
 
         std::cout << "Status register " << std::uppercase << std::hex << (int)status << std::endl;
 
-        uint8_t flag = device.FlagStatusRegister();
+        uint8_t flag = _device.FlagStatusRegister();
 
         std::cout << "Flag status register " << std::uppercase << std::hex << (int)flag << std::endl;
     }
 
-    void FlashController::WriteSomething(FlashDriver& device)
+    void FlashController::WriteSomething()
     {
         std::array<uint8_t, 256> data{};
         for(auto i = 0; i < data.size(); i++)
@@ -77,15 +77,15 @@ namespace flash
             data[i] = 255 - i;
         }
 
-        device.ProgramMemory(2_MB + 512_KB, data.data(), data.size());
+        _device.ProgramMemory(2_MB + 512_KB, data.data(), data.size());
     }
 
-    void FlashController::EraseRange(FlashDriver& device, std::uint32_t start, std::uint32_t end)
+    void FlashController::EraseRange(std::uint32_t start, std::uint32_t end)
     {
         for(auto sector = start; sector < end; sector += 4_KB)
         {
             std::cout << "0x" << std::hex << std::uppercase << sector << " " << sector + 4_KB << std::endl;
-            device.EraseSubsector(sector);
+            _device.EraseSubsector(sector);
         }
     }
 
