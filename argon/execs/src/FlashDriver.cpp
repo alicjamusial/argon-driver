@@ -18,7 +18,6 @@ namespace flash
     void FlashDriver::CommandNoSelect(const CommandType commandCode, std::uint8_t* response, std::size_t responseSize) const
     {
         this->WriteCommand(commandCode);
-        //        this->_spi.Write(reinterpret_cast<const uint8_t*>(commandCode), sizeof(uint8_t));
         this->_spi.Read(response, responseSize);
     }
 
@@ -166,7 +165,9 @@ namespace flash
             auto masked = flag & status;
 
             if(masked == expected)
+            {
                 return;
+            }
 
         } while(true);
     }

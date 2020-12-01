@@ -78,10 +78,10 @@ int main(int argc, char** argv)
     {
         uint32_t channels = listChannels();
 
-        uint32_t channelNo = -1;
+        uint32_t channelNo = 0;
 
         std::cout << "\nChoose channel: ";
-        std::cin >> channelNo;
+        //        std::cin >> channelNo;
 
         if(channelNo < channels)
         {
@@ -95,56 +95,76 @@ int main(int argc, char** argv)
             flash::FlashController flashController{flash};
 
             flashController.ReadId();
-            flashController.ReadStatus();
+            //            flashController.ReadStatus();
+            //
+            //            flash::FlashController flashController{flash};
+            //
+            //            flashController.ReadId();
+            //            flashController.ReadStatus();
+
+            std::string action;
+
+            while(action != "exit")
+            {
+                std::cout << "\nChoose action (exit|id|read): ";
+                std::cin >> action;
+                std::cout << "\n";
+
+                if(action == "id")
+                {
+                    flashController.ReadId();
+                }
+
+                if(action == "read")
+                {
+                    std::string location;
+                    std::cout << "\nChoose location to read: ";
+                    std::cin >> location;
+                    std::cout << "\n";
+
+                    std::cout << "Reading memory to " << location << std::endl;
+                    flashController.ReadAllMemory(location.c_str());
+                }
+
+                if(action == "erase_chip")
+                {
+                    std::cout << "Erasing chip" << std::endl;
+                    flashController.EraseChip();
+                }
+
+                if(argc == 2 && strcmp(argv[1], "erase_special") == 0)
+                {
+                    std::cout << "Erasing spacial " << std::endl;
+                    flashController.EraseRange(0x2000, 0x5FE000);
+                    return 0;
+                }
+
+                if(argc == 2 && strcmp(argv[1], "erase_normal") == 0)
+                {
+                    std::cout << "Erasing normal " << std::endl;
+                    flashController.EraseRange(0x600000, 0x7FC000);
+                    return 0;
+                }
+                if(argc == 2 && strcmp(argv[1], "read") == 0)
+                {
+                    std::cout << "Reading " << std::endl;
+                    flashController.ReadAllMemory("alicja.txt");
+                    return 0;
+                }
+                if(action == "write")
+                {
+                    std::cout << "Writing " << std::endl;
+                    flashController.WriteSomething();
+                }
+            }
         }
         else
         {
             std::cout << "\nWrong channel: " << channelNo << ". It has to be smaller than "
                       << channels << "." << std::endl;
         }
-
-        //        if(argc == 2 && strcmp(argv[1], "id") == 0)
-        //        {
-        //            flashController.ReadId();
-        //            return 0;
-        //        }
-        //
-        //        if(argc == 3 && strcmp(argv[1], "read") == 0)
-        //        {
-        //            std::cout << "Reading memory to " << argv[2] << std::endl;
-        //            flashController.ReadAllMemory(argv[2]);
-        //            return 0;
-        //        }
-        //
-        //        if(argc == 2 && strcmp(argv[1], "erase_special") == 0)
-        //        {
-        //            std::cout << "Erasing spacial " << std::endl;
-        //            flashController.EraseRange(0x2000, 0x5FE000);
-        //            return 0;
-        //        }
-        //
-        //        if(argc == 2 && strcmp(argv[1], "erase_normal") == 0)
-        //        {
-        //            std::cout << "Erasing normal " << std::endl;
-        //            flashController.EraseRange(0x600000, 0x7FC000);
-        //            return 0;
-        //        }
-        //        if(argc == 2 && strcmp(argv[1], "read") == 0)
-        //        {
-        //            std::cout << "Reading " << std::endl;
-        //            flashController.ReadAllMemory("alicja.txt");
-        //            return 0;
-        //        }
-        //        if(argc == 2 && strcmp(argv[1], "write") == 0)
-        //        {
-        //            std::cout << "Writing " << std::endl;
-        //            flashController.WriteSomething();
-        //            return 0;
-        //        }
     }
 
-    std::cout << "\nPress any key to continue...";
-    std::getchar();
-    std::getchar();
+    std::cout << "\nExiting.";
     return 0;
 }

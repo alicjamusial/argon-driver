@@ -89,4 +89,9 @@ namespace flash
         }
     }
 
+    void FlashController::EraseChip()
+    {
+        _device.EraseChip();
+    }
+
 }

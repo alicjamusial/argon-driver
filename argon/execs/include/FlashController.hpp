@@ -16,6 +16,7 @@ namespace flash
         void ReadStatus();
         void WriteSomething();
         void EraseRange(uint32_t start, uint32_t end);
+        void EraseChip();
 
     private:
         flash::FlashDriver _device;
