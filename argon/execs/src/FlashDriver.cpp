@@ -107,20 +107,10 @@ namespace flash
             SPISelectSlave select(this->_spi);
 
             std::uint8_t status = 0;
-            printf("Writing command\n");
+
             this->WriteCommand(CommandType::ProgramMemory);
-
-            StatusRegister();
-
-            printf("\nWriting address\n");
             this->WriteAddress(offset);
-
-            StatusRegister();
-
-            printf("\nWriting data\n");
             this->_spi.Write(data, size);
-
-            StatusRegister();
         }
         {
             SPISelectSlave select(this->_spi);
