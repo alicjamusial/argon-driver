@@ -73,6 +73,20 @@ std::uint32_t listChannels()
 
 int main(int argc, char** argv)
 {
+    if(argc == 2 && strcmp(argv[1], "--help") == 0)
+    {
+        std::cout << "Usage: argon.exe [channel] [action] [optional: action settings]" << std::endl
+                  << "Options:" << std::endl
+                  << "  [channel] - channel of the chosen FTDI port (0, 1, etc.)" << std::endl
+                  << "  [action] - "
+                     "exit|id|status|read|write|write_random|erase_normal|erase_special|erase_chip"
+                  << std::endl
+                  << "  [action settings] - for write: offset, location; for read: filename"
+                  << std::endl;
+
+        return 0;
+    }
+
     Init_libMPSSE();
 
     if(listDevices() > 0)
@@ -137,12 +151,12 @@ int main(int argc, char** argv)
                     flashController.EraseChip();
                 }
 
-                if(argc == 2 && strcmp(argv[1], "erase_special") == 0)
+                if(argc == 3 && strcmp(argv[1], "erase_special") == 0)
                 {
                     flashController.EraseRange(0x2000, 0x5FE000);
                 }
 
-                if(argc == 2 && strcmp(argv[1], "erase_normal") == 0)
+                if(argc == 3 && strcmp(argv[1], "erase_normal") == 0)
                 {
                     flashController.EraseRange(0x600000, 0x7FC000);
                 }
