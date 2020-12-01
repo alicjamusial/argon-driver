@@ -44,14 +44,32 @@ namespace flash
 
     enum class CommandType
     {
+        // Identification
         ReadId = 0x9F,
+        ReadId2 = 0x90,
+
+        // Register reads
         ReadStatusRegister = 0x05,
+        ReadStatusRegister2 = 0x35,
+        ReadStatusRegister3 = 0x15,
+        ReadLockRegister = 0xE8,
         ReadFlagStatusRegister = 0x70,
+        ReadNonvolatileConfigurationRegister = 0xB5,
+        ReadVolatileConfigurationRegister = 0x85,
+
+        // Reads
         ReadMemory = 0x03,
+
+        // Write operations
         WriteEnable = 0x06,
-        WriteDisable = 0x05,
+        WriteDisable = 0x04,
+
+        // Program operations
         ProgramMemory = 0x02,
-        EraseSubsector = 0x20,
+
+        // Erase operations
+        EraseSubsector = 0x20, // 4KB
+        EraseSector = 0xD8,    // 64KB
         EraseChip = 0xC7
     };
 
