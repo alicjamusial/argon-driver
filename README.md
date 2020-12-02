@@ -11,6 +11,5 @@ Argon software can be used in two modes:
 - console - build & run `argon.exe --help` to explore
  possible arguments
  
- Software is based on the module created by [Novakov
- ](https://github.com/novakov). Thanks! 
+ Software is based on the module created by [Novakov](https://github.com/novakov). Thanks! 
 🖤

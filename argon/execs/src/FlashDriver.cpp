@@ -36,6 +36,26 @@ namespace flash
         return Id(response[0], response[1], response[2], d);
     }
 
+    std::uint8_t FlashDriver::ReadRems() const
+    {
+        {
+            SPISelectSlave select(this->_spi);
+
+            this->WriteCommand(CommandType::ReadRems);
+            this->WriteAddress(0x00);
+
+            std::uint8_t response[16] = {0};
+            this->_spi.Read(reinterpret_cast<uint8_t*>(&response), 16);
+
+            for(auto elem: response)
+            {
+                printf("%d\n", elem);
+            }
+
+            return 0;
+        }
+    }
+
     Status FlashDriver::StatusRegister() const
     {
         std::uint8_t status;
@@ -50,6 +70,27 @@ namespace flash
         //        printf("WriteInProgress: %d\n", parsedStatus & Status::WriteInProgress);
 
         return parsedStatus;
+    }
+
+    std::uint8_t FlashDriver::StatusRegister2() const
+    {
+        std::uint8_t status{0};
+        this->Command(CommandType::ReadStatusRegister2, &status, sizeof(status));
+        return status;
+    }
+
+    std::uint8_t FlashDriver::StatusRegister3() const
+    {
+        std::uint8_t status{0};
+        this->Command(CommandType::ReadStatusRegister3, &status, sizeof(status));
+        return status;
+    }
+
+    std::uint8_t FlashDriver::StatusRegister4() const
+    {
+        std::uint8_t status{0};
+        this->Command(CommandType::ReadStatusRegister4, &status, sizeof(status));
+        return status;
     }
 
     FlagStatus FlashDriver::FlagStatusRegister() const

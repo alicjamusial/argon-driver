@@ -191,7 +191,8 @@ int main(int argc, char** argv)
                 {
                     std::cout << "\nChoose action "
                                  "(exit|id|status|read|write|write_random|erase_normal|erase_"
-                                 "special|erase_chip): ";
+                                 "special|erase_chip|status_register2|status_register3|status_"
+                                 "register4|rems): ";
                     std::cin >> action;
                     std::cout << "\n";
 
@@ -200,9 +201,29 @@ int main(int argc, char** argv)
                         flashController.ReadId();
                     }
 
+                    if(action == "rems")
+                    {
+                        flashController.ReadRems();
+                    }
+
                     if(action == "status")
                     {
                         flashController.ReadStatus();
+                    }
+
+                    if(action == "status_register2")
+                    {
+                        flashController.ReadStatusRegister2();
+                    }
+
+                    if(action == "status_register3")
+                    {
+                        flashController.ReadStatusRegister3();
+                    }
+
+                    if(action == "status_register4")
+                    {
+                        flashController.ReadStatusRegister4();
                     }
 
                     if(action == "read")

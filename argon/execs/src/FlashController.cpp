@@ -36,6 +36,12 @@ namespace flash
         std::cout << std::endl;
     }
 
+    void FlashController::ReadRems()
+    {
+        std::cout << "Reading REMS" << std::endl;
+        _device.ReadRems();
+    }
+
     void FlashController::ReadAllMemory(const char* fileName)
     {
         std::cout << "Reading memory to " << fileName << std::endl;
@@ -70,6 +76,30 @@ namespace flash
         uint8_t flag = _device.FlagStatusRegister();
 
         std::cout << "Flag status register " << std::uppercase << std::hex << (int)flag << std::endl;
+    }
+
+    void FlashController::ReadStatusRegister2()
+    {
+        std::cout << "Reading status register 2" << std::endl;
+        uint8_t status = _device.StatusRegister2();
+        std::cout << "Status register 2: " << std::uppercase << std::hex
+                  << static_cast<std::uint8_t>(status) << std::endl;
+    }
+
+    void FlashController::ReadStatusRegister3()
+    {
+        std::cout << "Reading status register 3" << std::endl;
+        uint8_t status = _device.StatusRegister3();
+        std::cout << "Status register 3: " << std::uppercase << std::hex
+                  << static_cast<std::uint8_t>(status) << std::endl;
+    }
+
+    void FlashController::ReadStatusRegister4()
+    {
+        std::cout << "Reading status register 4" << std::endl;
+        uint8_t status = _device.StatusRegister4();
+        std::cout << "Status register 4: " << std::uppercase << std::hex
+                  << static_cast<std::uint8_t>(status) << std::endl;
     }
 
     void FlashController::WriteSomething()

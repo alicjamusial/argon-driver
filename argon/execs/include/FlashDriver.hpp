@@ -46,12 +46,13 @@ namespace flash
     {
         // Identification
         ReadId = 0x9F,
-        ReadId2 = 0x90,
+        ReadRems = 0x90,
 
         // Register reads
         ReadStatusRegister = 0x05,
         ReadStatusRegister2 = 0x35,
         ReadStatusRegister3 = 0x15,
+        ReadStatusRegister4 = 0x07,
         ReadLockRegister = 0xE8,
         ReadFlagStatusRegister = 0x70,
         ReadNonvolatileConfigurationRegister = 0xB5,
@@ -81,8 +82,12 @@ namespace flash
         void Command(CommandType commandCode, std::uint8_t* response, std::size_t responseSize) const;
 
         Id ReadId() const;
+        std::uint8_t ReadRems() const;
         Status StatusRegister() const;
         FlagStatus FlagStatusRegister() const;
+        std::uint8_t StatusRegister2() const;
+        std::uint8_t StatusRegister3() const;
+        std::uint8_t StatusRegister4() const;
 
         void ReadMemory(uint32_t offset, std::uint8_t* buffer, std::size_t size) const;
 
