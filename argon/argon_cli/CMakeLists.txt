@@ -7,6 +7,9 @@ target_include_directories(${NAME} PRIVATE include)
 target_sources(${NAME} PRIVATE
     src/main.cpp
 
+    include/GlobalOptions.hpp
+    src/GlobalOptions.cpp
+
     include/commands/ListDevices.hpp
     src/commands/ListDevices.cpp
 

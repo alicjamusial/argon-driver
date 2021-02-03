@@ -1,15 +1,18 @@
 #pragma once
 #include "CLI/CLI.hpp"
+#include "GlobalOptions.hpp"
 
 namespace commands
 {
     class ReadId
     {
         public:
-            ReadId(CLI::App& app);
+            ReadId(GlobalOptions& global, CLI::App& app);
 
         private:
             void Execute();
+
+            GlobalOptions& _global;
             CLI::App* _cmd;
 
             bool _jedec;

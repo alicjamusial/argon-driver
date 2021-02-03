@@ -3,7 +3,8 @@
 
 namespace commands
 {
-    ReadId::ReadId(CLI::App& app):
+    ReadId::ReadId(GlobalOptions& global,CLI::App& app):
+        _global{global},
         _cmd{app.add_subcommand("read_id", "Read flash ID")},
         _jedec{true},
         _rems{false}
@@ -16,6 +17,9 @@ namespace commands
 
     void ReadId::Execute()
     {
+        printf("Selected serial %s\n", _global.Serial().c_str());
+        printf("Channel: %d\n", static_cast<int>(_global.Channel()));
+
         if(_jedec)
         {
             printf("Reading JEDEC ID\n");
