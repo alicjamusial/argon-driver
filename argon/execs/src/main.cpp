@@ -170,8 +170,11 @@ int main(int argc, char** argv)
         // Manual mode
         else
         {
+            std::string channelText;
+
             std::cout << "\nChoose channel: ";
-            std::cin >> channelNo;
+            std::cin >> channelText;
+            std::from_chars(channelText.data(), channelText.data() + channelText.size(), channelNo);
 
             if(channelNo < channels)
             {
