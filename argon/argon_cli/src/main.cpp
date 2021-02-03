@@ -1,35 +1,38 @@
 #include <cstdio>
 #include "CLI/CLI.hpp"
+#include "commands/ReadId.hpp"
 
 int main(int argc, char** argv)
 {
     CLI::App app{"Argon"};
 
+    commands::ReadId readId{app};
 
-    auto readIdCmd = app.add_subcommand("read_id", "Read flash JEDEC ID");
-    auto eraseCmd = app.add_subcommand("erase", "Erase flash sections");
-    auto readCmd = app.add_subcommand("read", "Read data from flash");
 
-    std::uint32_t startAddress;
-    eraseCmd->add_option("--start", startAddress, "Address of first sector to erase")->required();
-    readCmd->add_option("--start", startAddress, "Address where reading starts")->required();
-    std::string outputFile;
-    readCmd->add_option("--output", outputFile, "Output file")->required();
+    // auto readIdCmd = app.add_subcommand("read_id", "Read flash JEDEC ID");
+    // auto eraseCmd = app.add_subcommand("erase", "Erase flash sections");
+    // auto readCmd = app.add_subcommand("read", "Read data from flash");
 
-    readIdCmd->callback([]() {
-        printf("Reading id\n");
-    });
+    // std::uint32_t startAddress;
+    // eraseCmd->add_option("--start", startAddress, "Address of first sector to erase")->required();
+    // readCmd->add_option("--start", startAddress, "Address where reading starts")->required();
+    // std::string outputFile;
+    // readCmd->add_option("--output", outputFile, "Output file")->required();
 
-    eraseCmd->callback([&]() {
-        printf("Erasing\n");
-        printf("Start: 0x%04X\n", startAddress);
-    });
+    // readIdCmd->callback([]() {
+    //     printf("Reading id\n");
+    // });
 
-    readCmd->callback([&](){
-        printf("Reading\n");
-        printf("Start: 0x%04X\n", startAddress);
-        printf("Output file: %s\n", outputFile.c_str());
-    });
+    // eraseCmd->callback([&]() {
+    //     printf("Erasing\n");
+    //     printf("Start: 0x%04X\n", startAddress);
+    // });
+
+    // readCmd->callback([&](){
+    //     printf("Reading\n");
+    //     printf("Start: 0x%04X\n", startAddress);
+    //     printf("Output file: %s\n", outputFile.c_str());
+    // });
 
     app.require_subcommand(1);
 
