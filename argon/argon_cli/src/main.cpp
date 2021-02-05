@@ -1,35 +1,34 @@
 #include <cstdio>
 #include "CLI/CLI.hpp"
+#include "GlobalOptions.hpp"
+#include "commands/ReadId.hpp"
+#include "commands/ListDevices.hpp"
+#include "commands/Erase.hpp"
+#include "commands/RawSPI.hpp"
+#include "commands/Read.hpp"
+#include "commands/ReadStatus.hpp"
+#include "commands/Write.hpp"
 
 int main(int argc, char** argv)
 {
     CLI::App app{"Argon"};
 
+    GlobalOptions global{app};
 
-    auto readIdCmd = app.add_subcommand("read_id", "Read flash JEDEC ID");
-    auto eraseCmd = app.add_subcommand("erase", "Erase flash sections");
-    auto readCmd = app.add_subcommand("read", "Read data from flash");
+    commands::ListDevices listDevices{app};
+    commands::ReadId readId{global, app};
 
-    std::uint32_t startAddress;
-    eraseCmd->add_option("--start", startAddress, "Address of first sector to erase")->required();
-    readCmd->add_option("--start", startAddress, "Address where reading starts")->required();
-    std::string outputFile;
-    readCmd->add_option("--output", outputFile, "Output file")->required();
+    commands::EraseChip eraseChip{global, app};
+    commands::EraseRange eraseRange{global, app};
+    commands::EraseSector eraseSector{global, app};
 
-    readIdCmd->callback([]() {
-        printf("Reading id\n");
-    });
+    commands::RawSPI rawSPI{global, app};
 
-    eraseCmd->callback([&]() {
-        printf("Erasing\n");
-        printf("Start: 0x%04X\n", startAddress);
-    });
+    commands::Read read{global, app};
 
-    readCmd->callback([&](){
-        printf("Reading\n");
-        printf("Start: 0x%04X\n", startAddress);
-        printf("Output file: %s\n", outputFile.c_str());
-    });
+    commands::ReadStatus readStatus{global, app};
+
+    commands::Write write{global, app};
 
     app.require_subcommand(1);
 
