@@ -5,14 +5,13 @@
 #include "commands/RawSPI.hpp"
 #include "commands/Read.hpp"
 #include "commands/ReadId.hpp"
-#include "commands/ReadStatus.hpp"
+#include "commands/ReadStatusRegisters.hpp"
 #include "commands/Write.hpp"
 #include <cstdio>
 
 int main(int argc, char** argv)
 {
-    CLI::App app{"Argon"};
-
+    CLI::App app{"Argon CLI"};
     GlobalOptions global{app};
 
     commands::ListDevices listDevices{app};
@@ -26,7 +25,7 @@ int main(int argc, char** argv)
 
     commands::Read read{global, app};
 
-    commands::ReadStatus readStatus{global, app};
+    commands::ReadStatusRegisters readStatusRegisters{global, app};
 
     commands::Write write{global, app};
 

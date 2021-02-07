@@ -1,4 +1,5 @@
 #include "commands/ListDevices.hpp"
+#include "flash_controller/FlashDriver.hpp"
 
 namespace commands
 {
@@ -10,7 +11,35 @@ namespace commands
 
     void ListDevices::Execute()
     {
-        printf("Listing devices\n");
-        // TODO: list devices
+        std::cout << "Listing devices..." << std::endl;
+        Init_libMPSSE();
+
+        DWORD devicesCount = 0;
+
+        FT_CreateDeviceInfoList(&devicesCount);
+
+        std::vector<FT_DEVICE_LIST_INFO_NODE> devices;
+        devices.reserve(devicesCount);
+        auto r = FT_GetDeviceInfoList(devices.data(), &devicesCount);
+
+        std::cout << "Devices found: " << devicesCount << std::endl;
+
+        for(auto i = 0; i < devicesCount; i++)
+        {
+            std::cout << "Device " << i << ": " << devices[i].Description
+                      << "\t serial: " << devices[i].SerialNumber << std::endl;
+        }
+
+        std::uint32_t channels;
+        SPI_GetNumChannels(&channels);
+        printf("\nAvailable SPI channels found: %d\n", channels);
+
+        for(auto i = 0; i < channels; i++)
+        {
+            FT_DEVICE_LIST_INFO_NODE info;
+            SPI_GetChannelInfo(i, &info);
+
+            std::cout << i << ": " << info.Description << "\t serial: " << info.SerialNumber << std::endl;
+        }
     }
 }

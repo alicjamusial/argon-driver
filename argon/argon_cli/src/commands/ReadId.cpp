@@ -1,4 +1,5 @@
 #include "commands/ReadId.hpp"
+#include "flash_controller/DataFormatter.hpp"
 #include <cstdio>
 
 namespace commands
@@ -17,19 +18,30 @@ namespace commands
 
     void ReadId::Execute()
     {
-        printf("Selected serial %s\n", _global.Serial().c_str());
-        printf("Channel: %d\n", static_cast<int>(_global.Channel()));
-
-        if(_jedec)
+        try
         {
-            printf("Reading JEDEC ID\n");
-            // TODO: read id
+            auto spi = _global.ConnectToFlash();
+            flash::FlashDriver device{spi};
+
+            if(_jedec)
+            {
+                std::cout << "Reading JEDEC ID..." << std::endl;
+                auto id = device.ReadId();
+
+                flash::DataFormatter::FormatJedecId(id);
+            }
+
+            if(_rems)
+            {
+                std::cout << "Reading REMS..." << std::endl;
+                auto rems = device.ReadRems();
+
+                flash::DataFormatter::FormatRems(rems);
+            }
         }
-
-        if(_rems)
+        catch(std::exception e)
         {
-            printf("Reading REMS\n");
-            // TODO: read rems
+            return;
         }
     }
 }

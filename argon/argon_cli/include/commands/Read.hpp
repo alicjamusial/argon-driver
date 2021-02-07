@@ -1,6 +1,7 @@
 #pragma once
 #include "CLI/CLI.hpp"
 #include "GlobalOptions.hpp"
+#include "flash_controller/FlashDriver.hpp"
 
 namespace commands
 {

@@ -3,19 +3,25 @@
 namespace commands
 {
     EraseChip::EraseChip(GlobalOptions& global, CLI::App& app) :
-        _global{global}, _cmd{app.add_subcommand("erase_chip", "Erase chip")}
+        _global{global},
+        _cmd{app.add_subcommand("erase_chip", "Erase chip")}
     {
         _cmd->callback([this]() { Execute(); });
     }
 
     void EraseChip::Execute()
     {
-        printf("Erase chip\n");
-        // TODO: erase chip
+        auto spi = _global.ConnectToFlash();
+        flash::FlashDriver device{spi};
+
+        std::cout << "Erasing chip..." << std::endl;
+        device.EraseChip();
+        std::cout << "Done." << std::endl;
     }
 
     EraseRange::EraseRange(GlobalOptions& global, CLI::App& app) :
-        _global{global}, _cmd{app.add_subcommand("erase_range", "Erase sectors in range")}
+        _global{global},
+        _cmd{app.add_subcommand("erase_range", "Erase sectors in range")}
     {
         _cmd->callback([this]() { Execute(); });
 
@@ -34,7 +40,8 @@ namespace commands
     }
 
     EraseSector::EraseSector(GlobalOptions& global, CLI::App& app) :
-        _global{global}, _cmd{app.add_subcommand("erase_sector", "Erase single sector")}
+        _global{global},
+        _cmd{app.add_subcommand("erase_sector", "Erase single sector")}
     {
         _cmd->callback([this]() { Execute(); });
 

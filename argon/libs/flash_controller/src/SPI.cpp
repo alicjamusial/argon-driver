@@ -4,7 +4,7 @@
 #include <ftd2xx.h>
 #include <iostream>
 
-#include "SPI.hpp"
+#include "flash_controller/SPI.hpp"
 
 const std::string FTErrorTypes[] = {
     "FT_OK",
@@ -50,7 +50,6 @@ namespace spi
 
     SPI::~SPI()
     {
-        SPI_CloseChannel(this->_handle);
     }
 
     void SPI::ChipSelect(bool state) const

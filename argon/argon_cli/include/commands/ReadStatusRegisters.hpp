@@ -4,10 +4,10 @@
 
 namespace commands
 {
-    class ReadStatus
+    class ReadStatusRegisters
     {
     public:
-        ReadStatus(GlobalOptions& global, CLI::App& app);
+        ReadStatusRegisters(GlobalOptions& global, CLI::App& app);
 
     private:
         void Execute();

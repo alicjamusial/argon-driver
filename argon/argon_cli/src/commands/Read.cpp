@@ -1,4 +1,5 @@
 #include "commands/Read.hpp"
+#include "flash_controller/helpers.hpp"
 
 namespace commands
 {
@@ -17,9 +18,30 @@ namespace commands
 
     void Read::Execute()
     {
-        printf("Read data\n");
-        printf("Start: 0x%08X (%d)\n", _start, _start);
-        printf("End: 0x%08X (%d)\n", _start, _start);
-        printf("Output file: %s\n", _outputFilePath.c_str());
+        auto spi = _global.ConnectToFlash();
+        flash::FlashDriver device{spi};
+
+        std::cout << "> Reading memory from 0x" << std::hex << _start << " to 0x" << std::hex
+                  << _end << " to file " << _outputFilePath.c_str() << std::endl;
+
+        std::array<std::uint8_t, 1_MB> buffer{};
+
+        std::ofstream out(_outputFilePath.c_str(), std::ofstream::binary);
+
+        // TODO: fix to stop on end
+        for(uint32_t offset = _start; offset < _end; offset += buffer.size())
+        {
+            std::cout << "> Reading range from "
+                      << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
+                      << offset << " to "
+                      << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
+                      << (offset + buffer.size() - 1) << std::endl;
+
+            buffer.fill(0xCC);
+
+            device.ReadMemory(offset, buffer.data(), buffer.size());
+
+            out.write(reinterpret_cast<char*>(buffer.data()), buffer.size());
+        }
     }
 }

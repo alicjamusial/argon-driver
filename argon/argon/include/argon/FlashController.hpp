@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FlashDriver.hpp"
+#include "flash_controller/FlashDriver.hpp"
 #include <algorithm>
 #include <array>
 
@@ -12,16 +12,18 @@ namespace flash
         FlashController(FlashDriver& device);
 
         void ReadId();
-        void ReadAllMemory(const char* fileName);
-        void ReadStatus();
+        void ReadAllMemory();
+        void ReadFlagStatus();
         void ReadRems();
+        void ReadStatusRegister();
         void ReadStatusRegister2();
         void ReadStatusRegister3();
         void ReadStatusRegister4();
-        void Write(uint32_t offset, const uint8_t* data, size_t size);
-        void WriteSomething();
-        void EraseRange(uint32_t start, uint32_t end);
+        void Write();
+        void WriteFromFile();
+        void EraseRange();
         void EraseChip();
+        void EraseSector();
 
     private:
         flash::FlashDriver _device;

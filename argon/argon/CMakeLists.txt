@@ -5,17 +5,16 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif ()
 
 add_executable(${NAME}
+    include/argon/FlashController.hpp
+
     src/main.cpp
     src/FlashController.cpp
-    src/SPI.cpp
-    src/FlashDriver.cpp
 )
 
 target_link_libraries(${NAME}
     PUBLIC
+        flash_controller
         mpsse
-        ftdi
-        ${FTDI_DRIVER_PATH}/amd64/ftd2xx.lib
 )
 
 target_include_directories(${NAME} PUBLIC

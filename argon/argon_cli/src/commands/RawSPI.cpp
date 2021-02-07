@@ -3,7 +3,8 @@
 namespace commands
 {
     RawSPI::RawSPI(GlobalOptions& global, CLI::App& app) :
-        _global{global}, _cmd{app.add_subcommand("raw_spi", "Perform raw SPI transcation")}
+        _global{global},
+        _cmd{app.add_subcommand("raw_spi", "Perform raw SPI transcation")}
     {
         _cmd->callback([this]() { Execute(); });
 
@@ -23,6 +24,6 @@ namespace commands
         }
         printf("\n");
         printf("Receive count: %d\n", _rxCount);
-        // TODO: perform raw SPI
+        // TODO: perform raw SPI custom command
     }
 }
