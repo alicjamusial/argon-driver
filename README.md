@@ -15,9 +15,14 @@ Tested with N25Q, S25FL512S and Winbond W25Q flashes.
 **Remember**: different flashes can have various command addresses. If a command does not work on your flash device, there can be two reasons: it can have different address on this particular flash or your flash doesn't support this particular command at all. When in doubt, look into datasheets.
 
 ### ◾ Running software
-There are two execs included in [releases section]():
+First, download FTDI drivers from [their website](https://ftdichip.com/drivers/vcp-drivers/) and make sure your Argon or another FTDI-based flash reader is properly visible in the Device Manager.
+
+
+There are two execs included in [releases section](https://github.com/alicjamusial/argon-driver/releases/):
 - `argon.exe` - manual command line interface (handy on flash debugging)
 - `argon_cli.exe` - CLI for automation (run `argon_cli.exe --help` for usage hints). Example usage: `argon_cli.exe list`, `argon_cli.exe --serial FT613ZHMA read_id`
+
+Argon executables were tested on Windows 10 and 7. For other systems, you would have to build it by yourself.
 
 ### ◾ Building software
 #### Prerequisites
@@ -33,12 +38,21 @@ There are two execs included in [releases section]():
   <img src="https://contrib.rocks/image?repo=alicjamusial/argon-driver" />
 </a>
 
+### ◾ Supported commands
+- `Read JEDEC ID`
+- `Read REMS`
+- `Read status registers` (all 4)
+- `Read status flag`
+- `Address write`
+- `Memory read`
+- `Chip erase`
+
 ### ◾ TODO
 Commands:
-- `erase_range`
-- `erase_sector`
-- `write_from_file`
-- `custom command`
+- `Erase range`
+- `Erase sector`
+- `Write from file`
+- `Custom command`
 
 ### ◾ Known issues
 No known issues. If you find any - PRs are welcomed :)
