@@ -17,19 +17,45 @@ namespace commands
 
     void ReadId::Execute()
     {
-        printf("Selected serial %s\n", _global.Serial().c_str());
-        printf("Channel: %d\n", static_cast<int>(_global.Channel()));
-
-        if(_jedec)
+        try
         {
-            printf("Reading JEDEC ID\n");
-            // TODO: read id
+            auto spi = _global.ConnectToFlash();
+            flash::FlashDriver device{spi};
+
+            if(_jedec)
+            {
+                std::cout << "Reading JEDEC ID..." << std::endl;
+                auto id = device.ReadId();
+
+                std::cout << "> Manufacturer: "
+                          << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
+                          << "0x" << (int)id.Manufacturer << std::endl
+                          << "> Memory type: "
+                          << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
+                          << "0x" << (int)id.MemoryType << std::endl
+                          << "> Memory capacity: "
+                          << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
+                          << "0x" << (int)id.Capacity << std::endl
+                          << "> Data: ";
+
+                for(auto b: id.Data)
+                {
+                    std::cout << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
+                              << (int)b << " ";
+                }
+
+                std::cout << std::endl;
+            }
+
+            if(_rems)
+            {
+                std::cout << "Reading REMS..." << std::endl;
+                device.ReadRems();
+            }
         }
-
-        if(_rems)
+        catch(std::exception e)
         {
-            printf("Reading REMS\n");
-            // TODO: read rems
+            return;
         }
     }
 }

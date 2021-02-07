@@ -34,4 +34,5 @@ target_sources(${NAME} PRIVATE
 
 target_link_libraries(${NAME} PRIVATE
     CLI11::CLI11
+    flash_controller
 )

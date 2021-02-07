@@ -1,8 +1,11 @@
 #include <iostream>
 
-#include "flash_controller/FlashController.hpp"
+#include "argon/FlashController.hpp"
 #include <charconv>
 #include <ftd2xx.h>
+#include <map>
+#include <numeric>
+#include <vector>
 
 std::uint32_t listDevices()
 {
@@ -39,6 +42,37 @@ std::uint32_t listChannels()
     return channels;
 }
 
+std::string DefineCommandsMapping(std::map<std::string, void (flash::FlashController::*)()>& commandsMapping)
+{
+    commandsMapping["read_id"] = &flash::FlashController::ReadId;
+    commandsMapping["read_all"] = &flash::FlashController::ReadAllMemory;
+    commandsMapping["read_flag_status"] = &flash::FlashController::ReadFlagStatus;
+    commandsMapping["read_rems"] = &flash::FlashController::ReadRems;
+    commandsMapping["status_register"] = &flash::FlashController::ReadStatusRegister;
+    commandsMapping["status_register2"] = &flash::FlashController::ReadStatusRegister2;
+    commandsMapping["status_register3"] = &flash::FlashController::ReadStatusRegister3;
+    commandsMapping["status_register4"] = &flash::FlashController::ReadStatusRegister4;
+    commandsMapping["write"] = &flash::FlashController::Write;
+    commandsMapping["write_from_file"] = &flash::FlashController::WriteFromFile;
+    commandsMapping["erase_chip"] = &flash::FlashController::EraseChip;
+    commandsMapping["erase_range"] = &flash::FlashController::EraseRange;
+    commandsMapping["erase_sector"] = &flash::FlashController::EraseSector;
+
+    std::vector<std::string> commandLabels;
+    for(auto const& command: commandsMapping)
+    {
+        commandLabels.push_back(command.first);
+    }
+
+    std::string allLabels = std::accumulate(
+        std::begin(commandLabels),
+        std::end(commandLabels),
+        std::string(),
+        [](std::string& ss, std::string& s) { return ss.empty() ? s : ss + " | " + s; });
+
+    return allLabels;
+}
+
 int main(int argc, char** argv)
 {
     if(argc == 2 && strcmp(argv[1], "--help") == 0)
@@ -68,8 +102,12 @@ int main(int argc, char** argv)
             SPI spi(channelNo, 1 * 1000 * 1000, ChipSelectLine3 | ChipSelectActiveLow | SpiMode0);
             spi.ChipSelect(false);
 
+            // Initalize flash driver and controller
             flash::FlashDriver flash{spi};
             flash::FlashController flashController{flash};
+
+            std::map<std::string, void (flash::FlashController::*)()> commandsMapping;
+            auto allLabels = DefineCommandsMapping(commandsMapping);
 
             flashController.ReadId();
 
@@ -77,94 +115,19 @@ int main(int argc, char** argv)
 
             while(action != "exit")
             {
-                std::cout << "\nChoose action "
-                             "(exit|id|status|read|write|write_random|erase_normal|erase_"
-                             "special|erase_chip|status_register2|status_register3|status_"
-                             "register4|rems): ";
+                std::cout << "\nAvailable actions: exit | " << allLabels << std::endl;
+                std::cout << "Choose action:";
                 std::cin >> action;
                 std::cout << "\n";
 
-                if(action == "id")
+                auto CommandToExecute = commandsMapping.find(action);
+                if(CommandToExecute != commandsMapping.end())
                 {
-                    flashController.ReadId();
+                    (flashController.*commandsMapping[action])();
                 }
-
-                if(action == "rems")
+                else if(action != "exit")
                 {
-                    flashController.ReadRems();
-                }
-
-                if(action == "status")
-                {
-                    flashController.ReadStatus();
-                }
-
-                if(action == "status_register")
-                {
-                    flashController.ReadStatusRegister();
-                }
-
-                if(action == "status_register2")
-                {
-                    flashController.ReadStatusRegister2();
-                }
-
-                if(action == "status_register3")
-                {
-                    flashController.ReadStatusRegister3();
-                }
-
-                if(action == "status_register4")
-                {
-                    flashController.ReadStatusRegister4();
-                }
-
-                if(action == "read")
-                {
-                    std::string location;
-                    std::cout << "\nChoose filename to read to: ";
-                    std::cin >> location;
-                    std::cout << "\n";
-
-                    flashController.ReadAllMemory(location.c_str());
-                }
-
-                if(action == "write_random")
-                {
-                    flashController.WriteSomething();
-                }
-
-                if(action == "write")
-                {
-                    std::string offsetText;
-                    std::string locationText;
-
-                    std::cout << "\nOffset: ";
-                    std::cin >> offsetText;
-                    std::cout << "\nData to write: ";
-                    std::cin >> locationText;
-                    std::cout << "\n";
-
-                    std::uint32_t offset = 0;
-                    std::from_chars(offsetText.data(), offsetText.data() + offsetText.size(), offset);
-
-                    flashController.Write(
-                        offset, reinterpret_cast<const uint8_t*>(locationText.data()), locationText.size());
-                }
-
-                if(action == "erase_chip")
-                {
-                    flashController.EraseChip();
-                }
-
-                if(action == "erase_special")
-                {
-                    flashController.EraseRange(0x2000, 0x5FE000);
-                }
-
-                if(action == "erase_normal")
-                {
-                    flashController.EraseRange(0x600000, 0x7FC000);
+                    std::cout << "Wrong command, try again." << std::endl << std::endl;
                 }
             }
         }

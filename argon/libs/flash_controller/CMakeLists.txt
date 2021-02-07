@@ -13,12 +13,10 @@ target_link_libraries(${NAME} PUBLIC
 )
 
 target_sources(${NAME} PRIVATE
-    include/flash_controller/FlashController.hpp
     include/flash_controller/FlashDriver.hpp
     include/flash_controller/SPI.hpp
     include/flash_controller/helpers.hpp
 
-    src/FlashController.cpp
     src/FlashDriver.cpp
     src/SPI.cpp
 )

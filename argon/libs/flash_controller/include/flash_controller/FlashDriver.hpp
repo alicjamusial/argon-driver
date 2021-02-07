@@ -70,19 +70,21 @@ namespace flash
         void Command(CommandType commandCode, std::uint8_t* response, std::size_t responseSize) const;
 
         Id ReadId() const;
-        std::uint8_t ReadRems() const;
-        Status StatusRegister() const;
+        std::array<std::uint8_t, 16> ReadRems() const;
         std::uint8_t FlagStatusRegister() const;
         std::uint8_t StatusRegister2() const;
         std::uint8_t StatusRegister3() const;
         std::uint8_t StatusRegister4() const;
+        std::uint8_t StatusRegister1() const;
         void ReadMemory(std::uint32_t offset, std::uint8_t* buffer, std::size_t size) const;
         void ProgramMemory(std::uint32_t offset, const std::uint8_t* data, std::size_t size) const;
         void EraseSubsector(std::uint32_t offset) const;
         void EraseChip() const;
 
+        Status ParseStatusRegister() const;
+
     private:
-        SPI _spi;
+        SPI& _spi;
 
         void CommandNoSelect(CommandType commandCode, std::uint8_t* response, std::size_t responseSize) const;
 

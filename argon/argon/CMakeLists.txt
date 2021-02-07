@@ -5,7 +5,10 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif ()
 
 add_executable(${NAME}
+    include/argon/FlashController.hpp
+
     src/main.cpp
+    src/FlashController.cpp
 )
 
 target_link_libraries(${NAME}

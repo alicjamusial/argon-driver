@@ -1,11 +1,6 @@
 #pragma once
 #include "CLI/CLI.hpp"
-
-enum class ArgonChannel
-{
-    A,
-    B
-};
+#include "flash_controller/FlashDriver.hpp"
 
 class GlobalOptions
 {
@@ -14,20 +9,17 @@ public:
 
     GlobalOptions(CLI::App& app);
 
+    SPI ConnectToFlash();
+
     const std::string& Serial() const;
-    const ArgonChannel& Channel() const;
 
 private:
+    std::int32_t FindChannelBySerialNumber(const char* serialNumber);
+
     std::string _serial;
-    ArgonChannel _channel;
 };
 
 inline const std::string& GlobalOptions::Serial() const
 {
     return _serial;
-}
-
-inline const ArgonChannel& GlobalOptions::Channel() const
-{
-    return _channel;
 }

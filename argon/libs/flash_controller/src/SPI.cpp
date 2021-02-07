@@ -50,7 +50,7 @@ namespace spi
 
     SPI::~SPI()
     {
-        SPI_CloseChannel(this->_handle);
+        //        SPI_CloseChannel(this->_handle);
     }
 
     void SPI::ChipSelect(bool state) const
