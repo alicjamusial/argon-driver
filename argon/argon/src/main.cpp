@@ -12,9 +12,11 @@ std::uint32_t listDevices()
     DWORD devicesCount = 0;
 
     FT_CreateDeviceInfoList(&devicesCount);
-    auto devices = new FT_DEVICE_LIST_INFO_NODE[devicesCount];
 
-    auto r = FT_GetDeviceInfoList(devices, &devicesCount);
+    std::vector<FT_DEVICE_LIST_INFO_NODE> devices;
+    devices.reserve(devicesCount);
+    auto r = FT_GetDeviceInfoList(devices.data(), &devicesCount);
+
     std::cout << "Devices found: " << devicesCount << std::endl;
 
     for(auto i = 0; i < devicesCount; i++)

@@ -16,6 +16,7 @@ namespace commands
 
         std::cout << "Erasing chip..." << std::endl;
         device.EraseChip();
+        std::cout << "Done." << std::endl;
     }
 
     EraseRange::EraseRange(GlobalOptions& global, CLI::App& app) :

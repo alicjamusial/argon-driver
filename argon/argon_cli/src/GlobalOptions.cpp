@@ -39,8 +39,7 @@ std::int32_t GlobalOptions::FindChannelBySerialNumber(const char* serialNumber)
     }
 
     std::cout << "No serial number was chosen or no device with chosen serial number is connected. "
-                 "Use 'list devices --list' to "
-                 "list all available devices."
+                 "Use 'argon_cli.exe list' to list all available devices."
               << std::endl;
 
     return -1;
