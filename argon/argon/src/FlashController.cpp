@@ -68,43 +68,32 @@ namespace flash
     {
         std::cout << "> Reading flag status..." << std::endl;
 
-        uint8_t flag = _device.FlagStatusRegister();
-
-        std::cout << "> Flag status register: "
-                  << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
-                  << (int)flag << std::endl;
+        std::uint8_t flag = _device.FlagStatusRegister();
+        flash::DataFormatter::FormatFlagStatusRegister(flag);
     }
 
     void FlashController::ReadStatusRegister()
     {
-        std::cout << "> Reading status register..." << std::endl;
-        std::cout << "> Status register: "
-                  << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
-                  << (int)_device.StatusRegister1() << std::endl;
+        std::cout << "> Reading status register 1..." << std::endl;
+        flash::DataFormatter::FormatStatusRegister(_device.StatusRegister1());
     }
 
     void FlashController::ReadStatusRegister2()
     {
         std::cout << "> Reading status register 2..." << std::endl;
-        std::cout << "> Status register 2: "
-                  << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
-                  << (int)_device.StatusRegister2() << std::endl;
+        flash::DataFormatter::FormatStatusRegister(_device.StatusRegister2());
     }
 
     void FlashController::ReadStatusRegister3()
     {
         std::cout << "> Reading status register 3..." << std::endl;
-        std::cout << "> Status register 3: "
-                  << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
-                  << (int)_device.StatusRegister3() << std::endl;
+        flash::DataFormatter::FormatStatusRegister(_device.StatusRegister3());
     }
 
     void FlashController::ReadStatusRegister4()
     {
         std::cout << "> Reading status register 4..." << std::endl;
-        std::cout << "> Status register 4: "
-                  << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
-                  << (int)_device.StatusRegister4() << std::endl;
+        flash::DataFormatter::FormatStatusRegister(_device.StatusRegister4());
     }
 
     void FlashController::Write()

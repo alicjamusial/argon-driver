@@ -11,7 +11,7 @@
 
 int main(int argc, char** argv)
 {
-    CLI::App app{"Argon"};
+    CLI::App app{"Argon CLI"};
     GlobalOptions global{app};
 
     commands::ListDevices listDevices{app};

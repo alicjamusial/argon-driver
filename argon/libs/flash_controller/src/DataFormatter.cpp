@@ -40,4 +40,18 @@ namespace flash
 
         std::cout << std::endl;
     }
+
+    void DataFormatter::FormatStatusRegister(std::uint8_t status)
+    {
+        std::cout << "> Status register: "
+                  << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
+                  << (int)status << std::endl;
+    }
+
+    void DataFormatter::FormatFlagStatusRegister(std::uint8_t status)
+    {
+        std::cout << "> Status flag register: "
+                  << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
+                  << (int)status << std::endl;
+    }
 }

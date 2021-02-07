@@ -1,4 +1,5 @@
 #include "commands/ReadStatusRegisters.hpp"
+#include "flash_controller/DataFormatter.hpp"
 
 namespace commands
 {
@@ -12,7 +13,7 @@ namespace commands
     {
         _cmd->callback([this]() { Execute(); });
 
-        _cmd->add_flag("-1,!-1", _status, "Read status register");
+        _cmd->add_flag("-1,!--no-1", _status, "Read status register");
         _cmd->add_flag("-2", _status2, "Read status register 2");
         _cmd->add_flag("-3", _status3, "Read status register 3");
         _cmd->add_flag("-4", _status4, "Read status register 4");
@@ -20,10 +21,28 @@ namespace commands
 
     void ReadStatusRegisters::Execute()
     {
-        printf("Read status: %c\n", _status ? 'Y' : 'N');
-        printf("Read status2: %c\n", _status2 ? 'Y' : 'N');
-        printf("Read status3: %c\n", _status3 ? 'Y' : 'N');
-        printf("Read status4: %c\n", _status4 ? 'Y' : 'N');
-        // TODO: read status
+        auto spi = _global.ConnectToFlash();
+        flash::FlashDriver device{spi};
+
+        if(_status)
+        {
+            std::cout << "> Reading status register 1..." << std::endl;
+            flash::DataFormatter::FormatStatusRegister(device.StatusRegister1());
+        }
+        if(_status2)
+        {
+            std::cout << "> Reading status register 2..." << std::endl;
+            flash::DataFormatter::FormatStatusRegister(device.StatusRegister2());
+        }
+        if(_status3)
+        {
+            std::cout << "> Reading status register 3..." << std::endl;
+            flash::DataFormatter::FormatStatusRegister(device.StatusRegister3());
+        }
+        if(_status4)
+        {
+            std::cout << "> Reading status register 4..." << std::endl;
+            flash::DataFormatter::FormatStatusRegister(device.StatusRegister4());
+        }
     }
 }
