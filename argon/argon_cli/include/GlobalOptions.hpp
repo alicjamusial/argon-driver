@@ -9,17 +9,17 @@ enum class ArgonChannel
 
 class GlobalOptions
 {
-    public:
-        GlobalOptions(const GlobalOptions&) = delete;
+public:
+    GlobalOptions(const GlobalOptions&) = delete;
 
-        GlobalOptions(CLI::App& app);
+    GlobalOptions(CLI::App& app);
 
-        const std::string& Serial() const;
-        const ArgonChannel& Channel() const;
+    const std::string& Serial() const;
+    const ArgonChannel& Channel() const;
 
-    private:
-        std::string _serial;
-        ArgonChannel _channel;
+private:
+    std::string _serial;
+    ArgonChannel _channel;
 };
 
 inline const std::string& GlobalOptions::Serial() const

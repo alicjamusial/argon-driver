@@ -2,9 +2,8 @@
 
 namespace commands
 {
-    EraseChip::EraseChip(GlobalOptions& global, CLI::App& app):
-        _global{global},
-        _cmd{app.add_subcommand("erase_chip", "Erase chip")}
+    EraseChip::EraseChip(GlobalOptions& global, CLI::App& app) :
+        _global{global}, _cmd{app.add_subcommand("erase_chip", "Erase chip")}
     {
         _cmd->callback([this]() { Execute(); });
     }
@@ -15,18 +14,15 @@ namespace commands
         // TODO: erase chip
     }
 
-    EraseRange::EraseRange(GlobalOptions& global, CLI::App& app):
-        _global{global},
-        _cmd{app.add_subcommand("erase_range", "Erase sectors in range")}
+    EraseRange::EraseRange(GlobalOptions& global, CLI::App& app) :
+        _global{global}, _cmd{app.add_subcommand("erase_range", "Erase sectors in range")}
     {
         _cmd->callback([this]() { Execute(); });
 
         _cmd->add_option("-s,--start", _start, "Erase range: start offset")
             ->required()
             ->transform(CLI::AsSizeValue(false));
-        _cmd->add_option("-e,--end", _end, "Erase range: end offset")
-            ->required()
-            ->transform(CLI::AsSizeValue(false));
+        _cmd->add_option("-e,--end", _end, "Erase range: end offset")->required()->transform(CLI::AsSizeValue(false));
     }
 
     void EraseRange::Execute()
@@ -37,13 +33,12 @@ namespace commands
         // TODO: erase range
     }
 
-    EraseSector::EraseSector(GlobalOptions& global, CLI::App& app):
-        _global{global},
-        _cmd{app.add_subcommand("erase_sector", "Erase single sector")}
+    EraseSector::EraseSector(GlobalOptions& global, CLI::App& app) :
+        _global{global}, _cmd{app.add_subcommand("erase_sector", "Erase single sector")}
     {
         _cmd->callback([this]() { Execute(); });
 
-         _cmd->add_option("-o,--offset", _offset, "Address of sector to erase")
+        _cmd->add_option("-o,--offset", _offset, "Address of sector to erase")
             ->required()
             ->transform(CLI::AsSizeValue(false));
     }

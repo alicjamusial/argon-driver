@@ -16,10 +16,7 @@ namespace flash
         const std::array<std::uint8_t, 17> Data;
 
         Id(std::uint8_t manufacturer, std::uint8_t type, std::uint8_t capacity, std::array<uint8_t, 17> data) :
-            Manufacturer(manufacturer),
-            MemoryType(type),
-            Capacity(capacity),
-            Data(data)
+            Manufacturer(manufacturer), MemoryType(type), Capacity(capacity), Data(data)
         {
         }
     };

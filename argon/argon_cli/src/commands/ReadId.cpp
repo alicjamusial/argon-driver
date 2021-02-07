@@ -1,15 +1,15 @@
-#include <cstdio>
 #include "commands/ReadId.hpp"
+#include <cstdio>
 
 namespace commands
 {
-    ReadId::ReadId(GlobalOptions& global,CLI::App& app):
+    ReadId::ReadId(GlobalOptions& global, CLI::App& app) :
         _global{global},
         _cmd{app.add_subcommand("read_id", "Read flash ID")},
         _jedec{true},
         _rems{false}
     {
-        _cmd->callback([this](){ Execute(); });
+        _cmd->callback([this]() { Execute(); });
 
         _cmd->add_flag("--jedec,!--no-jedec", _jedec, "Read JEDEC ID");
         _cmd->add_flag("--rems", _rems, "Read REMS");

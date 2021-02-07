@@ -2,7 +2,7 @@
 
 namespace commands
 {
-    ReadStatus::ReadStatus(GlobalOptions& global, CLI::App& app): 
+    ReadStatus::ReadStatus(GlobalOptions& global, CLI::App& app) :
         _global{global},
         _cmd{app.add_subcommand("read_status", "Read flash status registers")},
         _status{true},

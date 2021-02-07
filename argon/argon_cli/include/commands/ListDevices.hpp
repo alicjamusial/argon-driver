@@ -5,12 +5,12 @@ namespace commands
 {
     class ListDevices
     {
-        public:
-            ListDevices(CLI::App& app);
+    public:
+        ListDevices(CLI::App& app);
 
-        private:
-            void Execute();
+    private:
+        void Execute();
 
-            CLI::App* _cmd;
+        CLI::App* _cmd;
     };
 }

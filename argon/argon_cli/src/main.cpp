@@ -1,13 +1,13 @@
-#include <cstdio>
 #include "CLI/CLI.hpp"
 #include "GlobalOptions.hpp"
-#include "commands/ReadId.hpp"
-#include "commands/ListDevices.hpp"
 #include "commands/Erase.hpp"
+#include "commands/ListDevices.hpp"
 #include "commands/RawSPI.hpp"
 #include "commands/Read.hpp"
+#include "commands/ReadId.hpp"
 #include "commands/ReadStatus.hpp"
 #include "commands/Write.hpp"
+#include <cstdio>
 
 int main(int argc, char** argv)
 {

@@ -2,9 +2,8 @@
 
 namespace commands
 {
-    Write::Write(GlobalOptions& global, CLI::App& app): 
-        _global{global},
-        _cmd{app.add_subcommand("write", "Write data to flash")}
+    Write::Write(GlobalOptions& global, CLI::App& app) :
+        _global{global}, _cmd{app.add_subcommand("write", "Write data to flash")}
     {
         _cmd->callback([this]() { Execute(); });
 
@@ -14,9 +13,7 @@ namespace commands
             ->required()
             ->transform(CLI::AsSizeValue(false));
 
-        _cmd->add_option("-f,--file", _inputFilePath, "Input file path")
-            ->required()
-            ->check(CLI::ExistingFile);
+        _cmd->add_option("-f,--file", _inputFilePath, "Input file path")->required()->check(CLI::ExistingFile);
     }
 
     void Write::Execute()
