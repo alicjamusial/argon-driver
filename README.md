@@ -17,7 +17,7 @@ Tested with N25Q, S25FL512S and Winbond W25Q flashes.
 ### ◾ Running software
 There are two execs included in [releases section]():
 - `argon.exe` - manual command line interface (handy on flash debugging)
-- `argon_cli.exe` - CLI for automation (run `argon_cli.exe --help` for usage hints)
+- `argon_cli.exe` - CLI for automation (run `argon_cli.exe --help` for usage hints). Example usage: `argon_cli.exe list`, `argon_cli.exe --serial FT613ZHMA read_id`
 
 ### ◾ Building software
 #### Prerequisites
