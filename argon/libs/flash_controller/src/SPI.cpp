@@ -33,11 +33,21 @@ const std::string FTErrorTypes[] = {
 
 namespace spi
 {
+    namespace details
+    {
+        void SPIChannelDeleter::operator()(void* ptr)
+        {
+            SPI_CloseChannel(ptr);
+        }
+    }
+
     SPI::SPI(uint32_t channel, std::uint32_t frequency, SPIBusOptions busOptions)
     {
-        Check(SPI_OpenChannel(channel, &this->_handle));
+        FT_HANDLE h;
+        Check(SPI_OpenChannel(channel, &h));
+        _handle = {h, {}};
 
-        FT_SetUSBParameters(this->_handle, 0xFFFF, 0xFFFF);
+        FT_SetUSBParameters(this->_handle.get(), 0xFFFF, 0xFFFF);
 
         ChannelConfig config;
 
@@ -45,16 +55,12 @@ namespace spi
         config.LatencyTimer = 1;
         config.configOptions = busOptions;
 
-        Check(SPI_InitChannel(this->_handle, &config));
-    }
-
-    SPI::~SPI()
-    {
+        Check(SPI_InitChannel(this->_handle.get(), &config));
     }
 
     void SPI::ChipSelect(bool state) const
     {
-        Check(SPI_ToggleCS(this->_handle, state));
+        Check(SPI_ToggleCS(this->_handle.get(), state));
     }
 
     void SPI::Write(const uint8_t* data, size_t size) const
@@ -67,7 +73,7 @@ namespace spi
 
             std::uint32_t transferred;
             Check(SPI_Write(
-                this->_handle, position, chunkSize, &transferred, SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES));
+                this->_handle.get(), position, chunkSize, &transferred, SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES));
 
             size -= transferred;
             position += transferred;
@@ -89,7 +95,7 @@ namespace spi
 
             std::uint32_t transfered;
             Check(SPI_Read(
-                this->_handle, position, chunkSize, &transfered, SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES));
+                this->_handle.get(), position, chunkSize, &transfered, SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES));
 
             size -= transfered;
             position += transfered;
@@ -102,7 +108,7 @@ namespace spi
         std::uint32_t transferred;
 
         SPI_ReadWrite(
-            this->_handle, &output, const_cast<std::uint8_t*>(&input), 1, &transferred, SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES);
+            this->_handle.get(), &output, const_cast<std::uint8_t*>(&input), 1, &transferred, SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES);
 
         return output;
     }
