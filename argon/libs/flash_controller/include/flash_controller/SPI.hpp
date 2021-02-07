@@ -4,6 +4,7 @@
 #include <exception>
 #include <stdexcept>
 #include <string>
+#include <memory>
 
 #include "ftd2xx.h"
 #include "mpsse/libMPSSE_spi.h"
@@ -36,15 +37,27 @@ private:
 
 namespace spi
 {
+    namespace details
+    {
+        struct SPIChannelDeleter
+        {
+            void operator()(void* ptr);
+        };
+
+        using SPIHandle = std::unique_ptr<void, SPIChannelDeleter>;
+    }
+
     class SPI
     {
     public:
+        SPI(const SPI& other) = delete;
+        SPI(SPI&& other) = default;
+
         SPI(std::uint32_t channel, std::uint32_t frequency, SPIBusOptions busOptions);
-        ~SPI();
 
         FT_HANDLE Handle() const
         {
-            return this->_handle;
+            return this->_handle.get();
         }
 
         void ChipSelect(bool state) const;
@@ -55,7 +68,7 @@ namespace spi
         std::uint8_t Exchange(std::uint8_t input);
 
     private:
-        FT_HANDLE _handle;
+        details::SPIHandle _handle;
 
         static void Check(FT_STATUS status);
     };
