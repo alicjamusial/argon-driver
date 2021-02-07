@@ -15,6 +15,7 @@ namespace flash
         void ReadAllMemory(const char* fileName);
         void ReadStatus();
         void ReadRems();
+        void ReadStatusRegister();
         void ReadStatusRegister2();
         void ReadStatusRegister3();
         void ReadStatusRegister4();

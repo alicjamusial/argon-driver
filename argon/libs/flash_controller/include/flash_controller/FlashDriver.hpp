@@ -16,7 +16,10 @@ namespace flash
         const std::array<std::uint8_t, 17> Data;
 
         Id(std::uint8_t manufacturer, std::uint8_t type, std::uint8_t capacity, std::array<uint8_t, 17> data) :
-            Manufacturer(manufacturer), MemoryType(type), Capacity(capacity), Data(data)
+            Manufacturer(manufacturer),
+            MemoryType(type),
+            Capacity(capacity),
+            Data(data)
         {
         }
     };
@@ -28,17 +31,6 @@ namespace flash
         WriteEnabled = 1 << 1,
         WriteInProgress = 1 << 0
     };
-
-    enum FlagStatus
-    {
-        ProgramEraseControllerReady = 1 << 7,
-        EraseSuspended = 1 << 6,
-        EraseError = 1 << 5,
-        ProgramError = 1 << 4,
-        VPPDisable = 1 << 3,
-        ProgramSuspended = 1 << 2
-    };
-
     enum class CommandType
     {
         // Identification
@@ -46,11 +38,10 @@ namespace flash
         ReadRems = 0x90,
 
         // Register reads
-        ReadStatusRegister = 0x05,
+        ReadStatusRegister1 = 0x05,
         ReadStatusRegister2 = 0x35,
         ReadStatusRegister3 = 0x15,
         ReadStatusRegister4 = 0x07,
-        ReadLockRegister = 0xE8,
         ReadFlagStatusRegister = 0x70,
         ReadNonvolatileConfigurationRegister = 0xB5,
         ReadVolatileConfigurationRegister = 0x85,
@@ -81,15 +72,13 @@ namespace flash
         Id ReadId() const;
         std::uint8_t ReadRems() const;
         Status StatusRegister() const;
-        FlagStatus FlagStatusRegister() const;
+        std::uint8_t FlagStatusRegister() const;
         std::uint8_t StatusRegister2() const;
         std::uint8_t StatusRegister3() const;
         std::uint8_t StatusRegister4() const;
-
-        void ReadMemory(uint32_t offset, std::uint8_t* buffer, std::size_t size) const;
-
-        void ProgramMemory(uint32_t offset, const std::uint8_t* data, std::size_t size) const;
-        void EraseSubsector(uint32_t offset) const;
+        void ReadMemory(std::uint32_t offset, std::uint8_t* buffer, std::size_t size) const;
+        void ProgramMemory(std::uint32_t offset, const std::uint8_t* data, std::size_t size) const;
+        void EraseSubsector(std::uint32_t offset) const;
         void EraseChip() const;
 
     private:

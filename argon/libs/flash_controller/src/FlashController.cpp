@@ -3,10 +3,10 @@
 #include <iomanip>
 #include <iostream>
 
-#include "FlashController.hpp"
-#include "FlashDriver.hpp"
-#include "SPI.hpp"
-#include "helpers.hpp"
+#include "flash_controller/FlashController.hpp"
+#include "flash_controller/FlashDriver.hpp"
+#include "flash_controller/SPI.hpp"
+#include "flash_controller/helpers.hpp"
 #include "mpsse/libMPSSE_spi.h"
 #include <cstddef>
 #include <ftd2xx.h>
@@ -19,18 +19,20 @@ namespace flash
 
     void FlashController::ReadId()
     {
-        std::cout << "Reading ID" << std::endl;
+        std::cout << "> Reading flash ID..." << std::endl;
         auto id = _device.ReadId();
 
-        std::cout
-            << "Manufacturer " << std::uppercase << std::hex << "0x" << (int)id.Manufacturer << std::endl
-            << "Memory type " << std::uppercase << std::hex << "0x" << (int)id.MemoryType << std::endl
-            << "Memory capacity " << std::uppercase << std::hex << "0x" << (int)id.Capacity << std::endl
-            << "Data: ";
+        std::cout << "Manufacturer " << std::uppercase << std::hex << std::showbase << "0x"
+                  << (int)id.Manufacturer << std::endl
+                  << "Memory type " << std::uppercase << std::hex << std::showbase << "0x"
+                  << (int)id.MemoryType << std::endl
+                  << "Memory capacity " << std::uppercase << std::hex << std::showbase << "0x"
+                  << (int)id.Capacity << std::endl
+                  << "Data: ";
 
         for(auto b: id.Data)
         {
-            std::cout << std::uppercase << std::hex << (int)b << " ";
+            std::cout << std::uppercase << std::hex << std::showbase << (int)b << " ";
         }
 
         std::cout << std::endl;
@@ -52,8 +54,9 @@ namespace flash
 
         for(uint32_t offset = 0_MB; offset < 8_MB; offset += buffer->size())
         {
-            std::cout << "Reading range from " << std::uppercase << std::hex << offset << " to "
-                      << std::uppercase << std::hex << (offset + buffer->size() - 1) << std::endl;
+            std::cout << "Reading range from " << std::uppercase << std::hex << std::showbase
+                      << offset << " to " << std::uppercase << std::hex << std::showbase
+                      << (offset + buffer->size() - 1) << std::endl;
 
             buffer->fill(0xCC);
 
@@ -71,18 +74,33 @@ namespace flash
 
         uint8_t status = _device.StatusRegister();
 
-        std::cout << "Status register " << std::uppercase << std::hex << (int)status << std::endl;
+        std::cout << "Status register " << std::uppercase << std::hex << std::showbase
+                  << (int)status << std::endl;
 
         uint8_t flag = _device.FlagStatusRegister();
 
-        std::cout << "Flag status register " << std::uppercase << std::hex << (int)flag << std::endl;
+        std::cout << "Flag status register " << std::uppercase << std::hex << std::showbase
+                  << (int)flag << std::endl;
+    }
+
+    void FlashController::ReadStatusRegister()
+    {
+        std::cout << "Reading status register " << std::endl;
+        Status status = _device.StatusRegister();
+        std::cout << "Status registera: " << std::uppercase << std::hex << std::showbase
+                  << static_cast<std::uint8_t>(status) << std::endl;
+        std::cout << "Status registerb: " << std::uppercase << std::hex << std::showbase
+                  << std::showbase << status << std::endl;
+        std::cout << "Status registerc: " << std::uppercase << static_cast<std::uint8_t>(status)
+                  << std::endl;
+        std::cout << "Status registerd: " << std::uppercase << status << std::endl;
     }
 
     void FlashController::ReadStatusRegister2()
     {
         std::cout << "Reading status register 2" << std::endl;
         uint8_t status = _device.StatusRegister2();
-        std::cout << "Status register 2: " << std::uppercase << std::hex
+        std::cout << "Status register 2: " << std::uppercase << std::hex << std::showbase
                   << static_cast<std::uint8_t>(status) << std::endl;
     }
 
@@ -90,7 +108,7 @@ namespace flash
     {
         std::cout << "Reading status register 3" << std::endl;
         uint8_t status = _device.StatusRegister3();
-        std::cout << "Status register 3: " << std::uppercase << std::hex
+        std::cout << "Status register 3: " << std::uppercase << std::hex << std::showbase
                   << static_cast<std::uint8_t>(status) << std::endl;
     }
 
@@ -98,7 +116,7 @@ namespace flash
     {
         std::cout << "Reading status register 4" << std::endl;
         uint8_t status = _device.StatusRegister4();
-        std::cout << "Status register 4: " << std::uppercase << std::hex
+        std::cout << "Status register 4: " << std::uppercase << std::hex << std::showbase
                   << static_cast<std::uint8_t>(status) << std::endl;
     }
 
@@ -128,7 +146,8 @@ namespace flash
 
         for(auto sector = start; sector < end; sector += 4_KB)
         {
-            std::cout << "0x" << std::hex << std::uppercase << sector << " " << sector + 4_KB << std::endl;
+            std::cout << "0x" << std::hex << std::showbase << std::uppercase << sector << " "
+                      << sector + 4_KB << std::endl;
             _device.EraseSubsector(sector);
         }
     }
