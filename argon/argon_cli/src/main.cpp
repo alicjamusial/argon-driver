@@ -5,7 +5,7 @@
 #include "commands/RawSPI.hpp"
 #include "commands/Read.hpp"
 #include "commands/ReadId.hpp"
-#include "commands/ReadStatus.hpp"
+#include "commands/ReadStatusRegisters.hpp"
 #include "commands/Write.hpp"
 #include <cstdio>
 
@@ -17,17 +17,17 @@ int main(int argc, char** argv)
     commands::ListDevices listDevices{app};
     commands::ReadId readId{global, app};
 
-    //    commands::EraseChip eraseChip{global, app};
-    //    commands::EraseRange eraseRange{global, app};
-    //    commands::EraseSector eraseSector{global, app};
-    //
-    //    commands::RawSPI rawSPI{global, app};
-    //
-    //    commands::Read read{global, app, flash};
-    //
-    //    commands::ReadFlagStatus readStatus{global, app};
-    //
-    //    commands::Write write{global, app};
+    commands::EraseChip eraseChip{global, app};
+    commands::EraseRange eraseRange{global, app};
+    commands::EraseSector eraseSector{global, app};
+
+    commands::RawSPI rawSPI{global, app};
+
+    commands::Read read{global, app};
+
+    commands::ReadStatusRegisters readStatusRegisters{global, app};
+
+    commands::Write write{global, app};
 
     app.require_subcommand(1);
 

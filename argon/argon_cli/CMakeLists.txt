@@ -25,8 +25,8 @@ target_sources(${NAME} PRIVATE
     include/commands/Read.hpp
     src/commands/Read.cpp
 
-    include/commands/ReadStatus.hpp
-    src/commands/ReadStatus.cpp
+        include/commands/ReadStatusRegisters.hpp
+        src/commands/ReadStatusRegisters.cpp
 
     include/commands/Write.hpp
     src/commands/Write.cpp

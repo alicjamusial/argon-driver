@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "argon/FlashController.hpp"
+#include "flash_controller/DataFormatter.hpp"
 #include "flash_controller/FlashDriver.hpp"
 #include "flash_controller/SPI.hpp"
 #include "flash_controller/helpers.hpp"
@@ -23,24 +24,7 @@ namespace flash
         std::cout << "> Reading flash ID..." << std::endl;
         auto id = _device.ReadId();
 
-        std::cout << "> Manufacturer: "
-                  << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
-                  << (int)id.Manufacturer << std::endl
-                  << "> Memory type: "
-                  << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
-                  << (int)id.MemoryType << std::endl
-                  << "> Memory capacity: "
-                  << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
-                  << (int)id.Capacity << std::endl
-                  << "> Data: ";
-
-        for(auto b: id.Data)
-        {
-            std::cout << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
-                      << (int)b << " ";
-        }
-
-        std::cout << std::endl;
+        flash::DataFormatter::FormatJedecId(id);
     }
 
     void FlashController::ReadRems()
@@ -48,12 +32,7 @@ namespace flash
         std::cout << "> Reading REMS..." << std::endl;
         auto rems = _device.ReadRems();
 
-        for(auto elem: rems)
-        {
-            std::cout << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
-                      << (int)elem << " ";
-        }
-        std::cout << std::endl;
+        flash::DataFormatter::FormatRems(rems);
     }
 
     void FlashController::ReadAllMemory()

@@ -16,7 +16,9 @@ target_sources(${NAME} PRIVATE
     include/flash_controller/FlashDriver.hpp
     include/flash_controller/SPI.hpp
     include/flash_controller/helpers.hpp
+    include/flash_controller/DataFormatter.hpp
 
     src/FlashDriver.cpp
+    src/DataFormatter.cpp
     src/SPI.cpp
 )

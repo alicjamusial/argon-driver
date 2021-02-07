@@ -2,10 +2,9 @@
 
 namespace commands
 {
-    Read::Read(GlobalOptions& global, CLI::App& app, flash::FlashDriver flash) :
+    Read::Read(GlobalOptions& global, CLI::App& app) :
         _global{global},
-        _cmd{app.add_subcommand("read", "Read data from flash")},
-        _flash{flash}
+        _cmd{app.add_subcommand("read", "Read data from flash")}
     {
         _cmd->callback([this]() { Execute(); });
 

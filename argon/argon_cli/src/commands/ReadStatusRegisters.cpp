@@ -1,10 +1,10 @@
-#include "commands/ReadStatus.hpp"
+#include "commands/ReadStatusRegisters.hpp"
 
 namespace commands
 {
-    ReadStatus::ReadStatus(GlobalOptions& global, CLI::App& app) :
+    ReadStatusRegisters::ReadStatusRegisters(GlobalOptions& global, CLI::App& app) :
         _global{global},
-        _cmd{app.add_subcommand("read_status", "Read flash status registers")},
+        _cmd{app.add_subcommand("read_status_registers", "Read flash status registers")},
         _status{true},
         _status2{false},
         _status3{false},
@@ -18,7 +18,7 @@ namespace commands
         _cmd->add_flag("-4", _status4, "Read status register 4");
     }
 
-    void ReadStatus::Execute()
+    void ReadStatusRegisters::Execute()
     {
         printf("Read status: %c\n", _status ? 'Y' : 'N');
         printf("Read status2: %c\n", _status2 ? 'Y' : 'N');

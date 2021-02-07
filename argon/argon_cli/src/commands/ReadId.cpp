@@ -1,4 +1,5 @@
 #include "commands/ReadId.hpp"
+#include "flash_controller/DataFormatter.hpp"
 #include <cstdio>
 
 namespace commands
@@ -27,30 +28,15 @@ namespace commands
                 std::cout << "Reading JEDEC ID..." << std::endl;
                 auto id = device.ReadId();
 
-                std::cout << "> Manufacturer: "
-                          << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
-                          << "0x" << (int)id.Manufacturer << std::endl
-                          << "> Memory type: "
-                          << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
-                          << "0x" << (int)id.MemoryType << std::endl
-                          << "> Memory capacity: "
-                          << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
-                          << "0x" << (int)id.Capacity << std::endl
-                          << "> Data: ";
-
-                for(auto b: id.Data)
-                {
-                    std::cout << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
-                              << (int)b << " ";
-                }
-
-                std::cout << std::endl;
+                flash::DataFormatter::FormatJedecId(id);
             }
 
             if(_rems)
             {
                 std::cout << "Reading REMS..." << std::endl;
-                device.ReadRems();
+                auto rems = device.ReadRems();
+
+                flash::DataFormatter::FormatRems(rems);
             }
         }
         catch(std::exception e)

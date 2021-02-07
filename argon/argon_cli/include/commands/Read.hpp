@@ -8,12 +8,10 @@ namespace commands
     class Read
     {
     public:
-        Read(GlobalOptions& global, CLI::App& app, flash::FlashDriver flash);
+        Read(GlobalOptions& global, CLI::App& app);
 
     private:
         void Execute();
-
-        flash::FlashDriver _flash;
 
         GlobalOptions& _global;
         CLI::App* _cmd;
