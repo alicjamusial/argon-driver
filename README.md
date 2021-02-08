@@ -26,12 +26,14 @@ Argon executables were tested on Windows 10 and 7. For other systems, you would 
 
 ### ◾ Building software
 #### Prerequisites
-- MinGW
-- FTDI drivers
-- `local-example.cmake` - filled with proper FTDI drivers path and copied to folder `.local` with a name `local.cmake`
+- MinGW/MS Visual C++
+- Optionally: FTDI drivers (if not provided, will be downloaded automatically)
+- Optionally: `local-example.cmake` - filled with proper FTDI drivers path and copied to folder `.local` with a name `local.cmake`
 #### Building
-- in build directory: `cmake.exe -DCMAKE_BUILD_TYPE=Debug -DLOCAL_CFG=[project path]/.local/local.cmake [project path]`
-- in build directory: `make`
+- in build directory:
+  - when using `local.cmake`: `cmake.exe -DCMAKE_BUILD_TYPE=Debug -DLOCAL_CFG=[project path]/.local/local.cmake [project path]`
+  - without `local.cmake`: `cmake.exe -DCMAKE_BUILD_TYPE=Debug [project path]`
+- in build directory: `cmake --build .`
 
 ### Contributors
 <a href="https://github.com/alicjamusial/argon-driver/graphs/contributors">

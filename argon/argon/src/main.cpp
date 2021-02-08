@@ -30,7 +30,7 @@ std::uint32_t listDevices()
 
 std::uint32_t listChannels()
 {
-    std::uint32_t channels;
+    uint32 channels;
     SPI_GetNumChannels(&channels);
     printf("\nAvailable SPI channels found: %d\n", channels);
 

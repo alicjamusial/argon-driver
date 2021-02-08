@@ -8,8 +8,6 @@ target_include_directories(${NAME} PUBLIC
 
 target_link_libraries(${NAME} PUBLIC
     mpsse
-    ftdi
-    ${FTDI_DRIVER_PATH}/amd64/ftd2xx.lib
 )
 
 target_sources(${NAME} PRIVATE

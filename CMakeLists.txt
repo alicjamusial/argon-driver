@@ -3,10 +3,10 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(LOCAL_CFG "" CACHE FILEPATH "Path to local config")
 
-if(NOT LOCAL_CFG)
-    message(FATAL_ERROR "LOCAL_CFG variable not set. Use -DLOCAL_CFG=<file> to set local config. See local-example.cmake for available options")
+if(LOCAL_CFG)
+    message(STATUS "Using config file from ${LOCAL_CFG}")
+    include(${LOCAL_CFG})
 endif()
-include(${LOCAL_CFG})
 
 set(NAME argon-driver)
 
