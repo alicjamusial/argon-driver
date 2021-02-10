@@ -13,8 +13,7 @@ std::uint32_t listDevices()
 
     FT_CreateDeviceInfoList(&devicesCount);
 
-    std::vector<FT_DEVICE_LIST_INFO_NODE> devices;
-    devices.reserve(devicesCount);
+    std::vector<FT_DEVICE_LIST_INFO_NODE> devices{devicesCount};
     auto r = FT_GetDeviceInfoList(devices.data(), &devicesCount);
 
     std::cout << "Devices found: " << devicesCount << std::endl;
