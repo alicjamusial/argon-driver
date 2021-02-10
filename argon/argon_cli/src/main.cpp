@@ -5,6 +5,7 @@
 #include "commands/RawSPI.hpp"
 #include "commands/Read.hpp"
 #include "commands/ReadId.hpp"
+#include "commands/ReadSfdp.hpp"
 #include "commands/ReadStatusRegisters.hpp"
 #include "commands/Write.hpp"
 #include <cstdio>
@@ -16,6 +17,7 @@ int main(int argc, char** argv)
 
     commands::ListDevices listDevices{app};
     commands::ReadId readId{global, app};
+    commands::ReadSfdp readSfdp{global, app};
 
     commands::EraseChip eraseChip{global, app};
     commands::EraseRange eraseRange{global, app};

@@ -3,6 +3,8 @@
 #include "SPI.hpp"
 #include <algorithm>
 #include <array>
+#include <optional>
+#include <vector>
 
 using namespace spi;
 
@@ -16,10 +18,7 @@ namespace flash
         const std::array<std::uint8_t, 17> Data;
 
         Id(std::uint8_t manufacturer, std::uint8_t type, std::uint8_t capacity, std::array<uint8_t, 17> data) :
-            Manufacturer(manufacturer),
-            MemoryType(type),
-            Capacity(capacity),
-            Data(data)
+            Manufacturer(manufacturer), MemoryType(type), Capacity(capacity), Data(data)
         {
         }
     };
@@ -62,6 +61,26 @@ namespace flash
         EraseChip = 0xC7
     };
 
+    struct FlashParameter
+    {
+        std::uint16_t ParameterId;
+        std::uint16_t Size;
+        std::uint32_t Offset;
+    };
+
+    struct SectorType
+    {
+        std::uint8_t Index;
+        std::uint8_t EraseOpcode;
+        std::uint32_t Size;
+    };
+
+    struct FlashInformation
+    {
+        std::vector<SectorType> SectorTypes;
+        std::size_t SizeInBytes;
+    };
+
     class FlashDriver
     {
     public:
@@ -82,6 +101,11 @@ namespace flash
         void EraseChip() const;
 
         Status ParseStatusRegister() const;
+
+        std::vector<FlashParameter> ReadSFDP();
+        std::vector<std::uint8_t> ReadParameter(const FlashParameter& parameter);
+
+        std::optional<FlashInformation> ReadFlashInformation();
 
     private:
         SPI& _spi;

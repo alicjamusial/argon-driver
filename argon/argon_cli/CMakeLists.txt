@@ -25,11 +25,14 @@ target_sources(${NAME} PRIVATE
     include/commands/Read.hpp
     src/commands/Read.cpp
 
-        include/commands/ReadStatusRegisters.hpp
-        src/commands/ReadStatusRegisters.cpp
+    include/commands/ReadStatusRegisters.hpp
+    src/commands/ReadStatusRegisters.cpp
 
     include/commands/Write.hpp
     src/commands/Write.cpp
+
+    include/commands/ReadSfdp.hpp
+    src/commands/ReadSfdp.cpp
     )
 
 target_link_libraries(${NAME} PRIVATE
