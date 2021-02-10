@@ -6,6 +6,11 @@
 
 #include "flash_controller/SPI.hpp"
 
+// Windows.h defines macro min(a,b) which breaks std::min
+#ifdef min
+#undef min
+#endif
+
 const std::string FTErrorTypes[] = {
     "FT_OK",
     "FT_INVALID_HANDLE",
@@ -71,7 +76,7 @@ namespace spi
         {
             std::uint32_t chunkSize = std::min(size, static_cast<size_t>(0x10000));
 
-            std::uint32_t transferred;
+            uint32 transferred;
             Check(SPI_Write(
                 this->_handle.get(), position, chunkSize, &transferred, SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES));
 
@@ -93,7 +98,7 @@ namespace spi
         {
             std::uint32_t chunkSize = std::min(size, static_cast<size_t>(0x10000));
 
-            std::uint32_t transfered;
+            uint32 transfered;
             Check(SPI_Read(
                 this->_handle.get(), position, chunkSize, &transfered, SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES));
 
@@ -105,7 +110,7 @@ namespace spi
     std::uint8_t SPI::Exchange(const std::uint8_t input)
     {
         std::uint8_t output = 55;
-        std::uint32_t transferred;
+        uint32 transferred;
 
         SPI_ReadWrite(
             this->_handle.get(), &output, const_cast<std::uint8_t*>(&input), 1, &transferred, SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES);

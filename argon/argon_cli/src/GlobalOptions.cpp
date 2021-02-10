@@ -25,7 +25,7 @@ SPI GlobalOptions::ConnectToFlash()
 
 std::int32_t GlobalOptions::FindChannelBySerialNumber(const char* serialNumber)
 {
-    std::uint32_t channels;
+    uint32 channels;
     SPI_GetNumChannels(&channels);
     for(int i = 0; i < channels; i++)
     {
