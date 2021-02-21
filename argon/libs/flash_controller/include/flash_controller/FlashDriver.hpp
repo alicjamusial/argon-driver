@@ -99,6 +99,7 @@ namespace flash
         void ProgramMemory(std::uint32_t offset, const std::uint8_t* data, std::size_t size) const;
         void EraseSubsector(std::uint32_t offset) const;
         void EraseChip() const;
+        void EraseSector(const SectorType& sectorType, std::uint32_t offset);
 
         Status ParseStatusRegister() const;
 

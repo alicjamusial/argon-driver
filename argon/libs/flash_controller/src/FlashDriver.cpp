@@ -334,4 +334,24 @@ namespace flash
 
         return result;
     }
+
+    void FlashDriver::EraseSector(const SectorType& sectorType, std::uint32_t offset)
+    {
+        this->WriteEnable();
+
+        {
+            SPISelectSlave select(this->_spi);
+
+            this->WriteCommand(CommandType{sectorType.EraseOpcode});
+            this->WriteAddress(offset);
+        }
+
+        {
+            SPISelectSlave select(this->_spi);
+
+            this->WaitBusy();
+        }
+
+        this->WriteDisable();
+    }
 }
