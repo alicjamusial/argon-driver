@@ -43,6 +43,7 @@ Argon executables were tested on Windows 10 and 7. For other systems, you would 
 ### ◾ Supported commands
 - `Read JEDEC ID`
 - `Read REMS`
+- `Read SFDP`
 - `Read status registers` (all 4)
 - `Read status flag`
 - `Address write`

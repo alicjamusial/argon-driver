@@ -13,6 +13,7 @@ namespace flash
 
         void ReadId();
         void ReadAllMemory();
+        void ReadSFDP();
         void ReadFlagStatus();
         void ReadRems();
         void ReadStatusRegister();
