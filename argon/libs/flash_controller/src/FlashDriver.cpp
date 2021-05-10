@@ -228,4 +228,110 @@ namespace flash
         this->Command(CommandType::WriteDisable, nullptr, 0);
         this->WaitForStatus(Status::WriteEnabled, false);
     }
+
+    std::vector<FlashParameter> FlashDriver::ReadSFDP()
+    {
+        SPISelectSlave select(this->_spi);
+        std::uint8_t command[] = {
+            0x5A,
+            0x0,
+            0x0,
+            0x0,
+            0xFF,
+        };
+        std::array<std::uint8_t, 8> response{};
+        this->_spi.Write(command, sizeof(command));
+        this->_spi.Read(response.data(), response.size());
+
+        bool isValidResponse = true;
+        isValidResponse &= response[0] == 'S';
+        isValidResponse &= response[1] == 'F';
+        isValidResponse &= response[2] == 'D';
+        isValidResponse &= response[3] == 'P';
+
+        if(!isValidResponse)
+        {
+            return {};
+        }
+
+        std::uint8_t numberOfParameters = response[6] + 1;
+
+        std::vector<FlashParameter> parameters;
+        parameters.reserve(numberOfParameters);
+
+        for(int i = 0; i < numberOfParameters; i++)
+        {
+            std::array<std::uint8_t, 8> header{};
+
+            this->_spi.Read(header.data(), header.size());
+
+            FlashParameter parameter{};
+            parameter.Offset = (header[4] << 0) | (header[5] << 8) | (header[6] << 16);
+            parameter.Size = header[3] * 4;
+            parameter.ParameterId = (header[0] << 0) | (header[7] << 8);
+
+            parameters.push_back(parameter);
+        }
+
+        return parameters;
+    }
+
+    std::vector<std::uint8_t> FlashDriver::ReadParameter(const FlashParameter& parameter)
+    {
+        std::vector<std::uint8_t> response(parameter.Size, std::uint8_t{0});
+
+        SPISelectSlave select(this->_spi);
+        std::uint8_t command[] = {
+            0x5A,
+            static_cast<std::uint8_t>((parameter.Offset >> 16) & 0xFF),
+            static_cast<std::uint8_t>((parameter.Offset >> 8) & 0xFF),
+            static_cast<std::uint8_t>((parameter.Offset >> 0) & 0xFF),
+            0xFF,
+        };
+        this->_spi.Write(command, sizeof(command));
+        this->_spi.Read(response.data(), response.size());
+
+        return response;
+    }
+
+    std::optional<FlashInformation> FlashDriver::ReadFlashInformation()
+    {
+        auto parameters = ReadSFDP();
+        if(parameters.empty())
+        {
+            return std::nullopt;
+        }
+
+        auto baseInfo = ReadParameter(parameters[0]);
+
+        FlashInformation result;
+
+        auto density =
+            (baseInfo[4] << 0) | (baseInfo[5] << 8) | (baseInfo[6] << 16) | (baseInfo[7] << 24);
+        density++;
+
+        result.SizeInBytes = density / 8;
+
+        for(int i = 0; i < 4; i++)
+        {
+            auto base = 7 * 4 + i * 2;
+
+            auto size = 1 << baseInfo[base + 0];
+            auto opcode = baseInfo[base + 1];
+
+            if(size == 1)
+            {
+                continue;
+            }
+
+            SectorType sector{};
+            sector.Index = i + 1;
+            sector.Size = size;
+            sector.EraseOpcode = opcode;
+
+            result.SectorTypes.push_back(sector);
+        }
+
+        return result;
+    }
 }

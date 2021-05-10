@@ -47,6 +47,7 @@ std::string DefineCommandsMapping(std::map<std::string, void (flash::FlashContro
 {
     commandsMapping["read_id"] = &flash::FlashController::ReadId;
     commandsMapping["read_all"] = &flash::FlashController::ReadAllMemory;
+    commandsMapping["read_info"] = &flash::FlashController::ReadSFDP;
     commandsMapping["read_flag_status"] = &flash::FlashController::ReadFlagStatus;
     commandsMapping["read_rems"] = &flash::FlashController::ReadRems;
     commandsMapping["status_register"] = &flash::FlashController::ReadStatusRegister;
