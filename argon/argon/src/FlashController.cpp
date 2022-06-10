@@ -145,8 +145,42 @@ namespace flash
 
     void FlashController::WriteFromFile()
     {
-        std::cout << "> Writing from file... Not yet implemented" << std::endl;
-        // TODO: Write from file
+        std::string fileName;
+        std::string offsetText;
+        std::cout << "> Choose path to write from (e.g. D:/test.bin): ";
+        std::cin >> fileName;
+        std::cout << "\n";
+
+        std::cout << "> Choose offset: ";
+        std::cin >> offsetText;
+
+        std::uint32_t start = 0;
+        std::from_chars(offsetText.data(), offsetText.data() + offsetText.size(), start);
+
+        std::cout << "> Writing memory from " << fileName << std::endl;
+
+        std::array<uint8_t, 1_MB> buffer{};
+
+        std::ifstream in(fileName, std::ifstream::binary | std::ifstream::ate);
+        auto size = in.tellg().state();
+        in.seekg(0);
+
+        for(uint32_t offset = 0; offset < size;)
+        {
+            auto write_size = std::min(static_cast<std::uint32_t>(buffer.size()), size - offset);
+
+            in.read(reinterpret_cast<char*>(buffer.data()), write_size);
+
+            std::cout << "> Writing range from "
+                      << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
+                      << (start + offset) << " to "
+                      << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
+                      << (start + offset + write_size - 1) << std::endl;
+
+            _device.ProgramMemory(start + offset, reinterpret_cast<const uint8_t*>(buffer.data()), write_size);
+
+            offset += write_size;
+        }
     }
 
     void FlashController::EraseRange()

@@ -28,20 +28,21 @@ namespace commands
 
         std::ofstream out(_outputFilePath.c_str(), std::ofstream::binary);
 
-        // TODO: fix to stop on end
-        for(uint32_t offset = _start; offset < _end; offset += buffer.size())
+        for(uint32_t offset = _start; offset < _end;)
         {
+            auto read_size = std::min(static_cast<std::uint32_t>(buffer.size()), _end - offset);
             std::cout << "> Reading range from "
                       << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
                       << offset << " to "
                       << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
-                      << (offset + buffer.size() - 1) << std::endl;
+                      << (offset + read_size - 1) << std::endl;
 
             buffer.fill(0xCC);
 
-            device.ReadMemory(offset, buffer.data(), buffer.size());
+            device.ReadMemory(offset, buffer.data(), read_size);
 
-            out.write(reinterpret_cast<char*>(buffer.data()), buffer.size());
+            out.write(reinterpret_cast<char*>(buffer.data()), read_size);
+            offset += read_size;
         }
     }
 }
