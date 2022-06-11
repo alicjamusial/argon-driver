@@ -1,4 +1,5 @@
 #include "commands/Write.hpp"
+#include "flash_controller/helpers.hpp"
 
 namespace commands
 {
@@ -19,9 +20,33 @@ namespace commands
 
     void Write::Execute()
     {
-        printf("Write data\n");
-        printf("Start: 0x%08X (%d)\n", _start, _start);
-        printf("Input file: %s\n", _inputFilePath.c_str());
-        // TODO: write data from file
+        auto spi = _global.ConnectToFlash();
+        flash::FlashDriver device{spi};
+
+        std::ifstream in(_inputFilePath, std::ifstream::binary | std::ifstream::ate);
+        auto size = static_cast<uint32_t>(in.tellg());
+        in.seekg(0);
+
+        std::array<std::uint8_t, 1_MB> buffer{};
+
+        std::cout << "> Writing memory from 0x" << std::hex << _start << " to 0x" << std::hex
+                  << (_start + size) << " from file " << _inputFilePath.c_str() << std::endl;
+
+        for(uint32_t offset = 0; offset < size;)
+        {
+            auto write_size = std::min(static_cast<std::uint32_t>(buffer.size()), size - offset);
+
+            in.read(reinterpret_cast<char*>(buffer.data()), write_size);
+
+            std::cout << "> Writing range from "
+                      << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
+                      << (_start + offset) << " to "
+                      << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex
+                      << (_start + offset + write_size - 1) << std::endl;
+
+            device.ProgramMemory(_start + offset, reinterpret_cast<const uint8_t*>(buffer.data()), write_size);
+
+            offset += write_size;
+        }
     }
 }
